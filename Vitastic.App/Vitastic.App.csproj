@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+      <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Vitastic.Domain\Vitastic.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Features\Categories\Events\" />
+      <Folder Include="Features\Courses\Commands\DisableCertificate\" />
+      <Folder Include="Features\Courses\Commands\EnableCertificate\" />
+      <Folder Include="Features\Courses\Commands\Publish\" />
+      <Folder Include="Features\Courses\Commands\RemoveCategory\" />
+      <Folder Include="Features\Courses\Commands\RemoveDemo\" />
+      <Folder Include="Features\Courses\Commands\RemoveSectionEpisode\" />
+      <Folder Include="Features\Courses\Commands\RemoveSection\" />
+      <Folder Include="Features\Courses\Commands\RemoveTag\" />
+      <Folder Include="Features\Courses\Commands\ReorderSections\" />
+      <Folder Include="Features\Courses\Commands\SetCategoryList\" />
+      <Folder Include="Features\Courses\Commands\SetDemo\" />
+      <Folder Include="Features\Courses\Commands\SetTagList\" />
+      <Folder Include="Features\Courses\Commands\Unpublish\" />
+      <Folder Include="Features\Courses\Commands\UpdateDescription\" />
+      <Folder Include="Features\Courses\Commands\SetImage\" />
+      <Folder Include="Features\Courses\Commands\UpdateLevel\" />
+      <Folder Include="Features\Orders\Dtos\" />
+      <Folder Include="Features\Orders\Events\" />
+      <Folder Include="Features\Tags\Events\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" />
+      <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+      <PackageReference Include="MediatR" />
+      <PackageReference Include="Microsoft.AspNetCore.JsonPatch" />
+    </ItemGroup>
+
+
+
+</Project>
