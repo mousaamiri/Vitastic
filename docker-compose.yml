@@ -1,0 +1,21 @@
+services:
+  vitastic.api:
+    image: ${DOCKER_REGISTRY-}vitasticapi
+    build:
+      context: .
+      dockerfile: Vitastic.Api/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+
+  vistastic.database:
+     image: postgres:15
+     container_name: vistatic-database
+     environment:
+        POSTGRES_USER: vitastic
+        POSTGRES_PASSWORD: vitastic
+        POSTGRES_DB: vitastic
+     volumes:
+      - ./.containers/vitastic-db:/var/lib/postgresql/data
+     ports:
+       - "5432:5432"
