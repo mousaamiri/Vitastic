@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11312.210
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitastic.Web", "Vitastic.Web\Vitastic.Web.csproj", "{C16CE57F-AB5D-479C-A416-46C8765FAF84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitastic.Domain", "Vitastic.Domain\Vitastic.Domain.csproj", "{A1AC0465-88CB-4341-B870-9B0C81A2F225}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitastic.Infra", "Vitastic.Infra\Vitastic.Infra.csproj", "{A4367591-FE62-4366-8B44-0E79EF37F84F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitastic.App", "Vitastic.App\Vitastic.App.csproj", "{BADC2961-8656-402B-A5E1-EEBDAFECCB7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vitastic.Api", "Vitastic.Api\Vitastic.Api.csproj", "{95E2F384-F092-42B6-B52E-FD156AC5D793}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1FD6E55E-D856-4CEB-87F9-8029002521AB}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.ruleset = .ruleset
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C16CE57F-AB5D-479C-A416-46C8765FAF84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C16CE57F-AB5D-479C-A416-46C8765FAF84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C16CE57F-AB5D-479C-A416-46C8765FAF84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C16CE57F-AB5D-479C-A416-46C8765FAF84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1AC0465-88CB-4341-B870-9B0C81A2F225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1AC0465-88CB-4341-B870-9B0C81A2F225}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1AC0465-88CB-4341-B870-9B0C81A2F225}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1AC0465-88CB-4341-B870-9B0C81A2F225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4367591-FE62-4366-8B44-0E79EF37F84F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4367591-FE62-4366-8B44-0E79EF37F84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4367591-FE62-4366-8B44-0E79EF37F84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4367591-FE62-4366-8B44-0E79EF37F84F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BADC2961-8656-402B-A5E1-EEBDAFECCB7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BADC2961-8656-402B-A5E1-EEBDAFECCB7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BADC2961-8656-402B-A5E1-EEBDAFECCB7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BADC2961-8656-402B-A5E1-EEBDAFECCB7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E2F384-F092-42B6-B52E-FD156AC5D793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E2F384-F092-42B6-B52E-FD156AC5D793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E2F384-F092-42B6-B52E-FD156AC5D793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E2F384-F092-42B6-B52E-FD156AC5D793}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {69CC1345-BF15-4994-A575-CA152CC22AEA}
+	EndGlobalSection
+EndGlobal
