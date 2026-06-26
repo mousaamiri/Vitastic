@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>bf7fca89-250d-444a-833f-a6a6d6f7cdbf</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" />
+    <PackageVersion Include="Meziantou.Analyzer" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vitastic.App\Vitastic.App.csproj" />
+    <ProjectReference Include="..\Vitastic.Infra\Vitastic.Infra.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\img\education\courses\a0bec5b0-94b2-42df-aa7c-b2d48956132a.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\img\education\courses\thumb-a0bec5b0-94b2-42df-aa7c-b2d48956132a.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\05caa85b-b342-46af-8260-73589b946c62.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\1.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\10.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\11.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\12.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\13.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\14.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\15.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\16.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\17.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\18.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\1f11c76e-895b-431c-8038-3e996d8c7f08.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\2.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\20.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\250fd87e-c9b3-423d-b87d-7c8cb17c552b.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\295af55c-5018-404c-8c66-e1b20158e983.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\3.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\4.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\432ee247-2cf5-44e5-a38a-cfc9733b8c18.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\476d0f84-87ec-4ed1-8927-917782c83800.gif" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\5.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\54c315a2-9702-4f9d-b927-93223473f64b.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\6.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\7.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\751bd279-9d26-43d9-afe0-0899c4d1c242.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\8.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\9.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\a3147145-b844-41df-b4e5-244eb6693725.gif" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\a8c76352-c3a3-4ffe-9132-bf9c8d335737.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\account.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\b3bda6b0-b204-46bb-a165-36a6641c00ef.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\c944165f-d149-4304-a9eb-046585a09c23.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\default.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\e34b29fd-23ab-45b3-9e57-d55ce030ffd0.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\admin-assets\assets\img\avatars\e3d011a5-1c36-455a-8b8f-13729edd9601.gif" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\3a67ddf9-d7af-412f-baff-9f1511a4ec7d\Image\c2ebff11-170f-414e-bdad-c0858e7b979c.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\3a67ddf9-d7af-412f-baff-9f1511a4ec7d\Thumbnail\e517de21-a15f-4c68-9194-befeeb594fa7.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\25dd1830-b1ce-4263-acf8-f1ee6ca4136b\Image\df3b61be-3502-48be-8b9c-0a8cfa01dacd.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\25dd1830-b1ce-4263-acf8-f1ee6ca4136b\Thumbnail\e4e5d5e2-0684-4fb7-89e5-935851bc53d0.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\639bb14f-d6b9-482a-b3b8-61d4473fac69\Image\62aa9323-468d-4364-8542-afdd1712ef15.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\639bb14f-d6b9-482a-b3b8-61d4473fac69\Thumbnail\7af01690-e4ed-4c4c-8783-9e39eeb94b5b.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\20459187-9dbd-4351-a1a7-de5aa3494d48\Image\efe9d6d5-6199-4dcd-8184-6d1c64dc71de.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\storage\Course\20459187-9dbd-4351-a1a7-de5aa3494d48\Thumbnail\91c283f9-1b17-415e-ae51-6829d38e4490.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\storage\User\Default\default.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\storage\Instructor\Default\default.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\storage\Instructor\Default\profil-photo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\storage\User\Default\profil-photo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
