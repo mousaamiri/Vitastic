@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" />
+      <PackageReference Include="MediatR" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
+      <PackageReference Include="Newtonsoft.Json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Entities\Cart\Enums\" />
+      <Folder Include="Entities\Users\Enums\" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+﻿namespace Vitastic.Domain.Entities.Orders.Enums
+{
+    public enum OrderStatus
+    {
+        Pending = 1,
+        Processing = 2,
+        Completed = 3,
+        Cancelled = 4,
+        Refunded = 5,
+        Failed = 6
+    }
+}
