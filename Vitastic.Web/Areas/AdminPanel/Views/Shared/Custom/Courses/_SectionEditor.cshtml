@@ -1,0 +1,25 @@
+@* @model Vitastic.Web.Areas.Admin.Models.Course.SectionUiModel *@
+@* *@
+@* <div class="card mb-3 section-item"> *@
+@*   <div class="card-body"> *@
+@*     <div class="d-flex justify-content-between align-items-center"> *@
+@*       <input type="hidden" name="Sections.Index" value="@Guid.NewGuid()" /> *@
+@*       <input type="text" name="Sections[@Guid.NewGuid()].SectionTitle" value="@Model.Title" placeholder="Section title" class="form-control w-75" /> *@
+@*       <button type="button" class="btn btn-danger btn-sm remove-section">X</button> *@
+@*     </div> *@
+@* *@
+@*     <div class="episodes mt-3"> *@
+@*       @for (int j = 0; j < Model.Episodes.Count; j++) *@
+@*       { *@
+@*         <div class="input-group mb-2 episode-item"> *@
+@*           <input type="text" name="Sections[@Guid.NewGuid()].Episodes[@Guid.NewGuid()].Title" *@
+@*                  value="@Model.Episodes[j].Title" *@
+@*                  placeholder="Episode title" class="form-control" /> *@
+@*           <button type="button" class="btn btn-outline-danger remove-episode">x</button> *@
+@*         </div> *@
+@*       } *@
+@*     </div> *@
+@* *@
+@*     <button type="button" class="btn btn-outline-secondary add-episode mt-2">Add Episode</button> *@
+@*   </div> *@
+@* </div> *@

@@ -1,0 +1,252 @@
+@model Vitastic.Web.Models.ViewModels.WalletInfoModel
+
+
+<div class="row">
+<div class="col-12">
+  @if (TempData["ErrorMessage"] is not null)
+  {
+      <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+  }
+  <div class="filter cm-content-box box-primary">
+    <div class="content-title SlideToolHeader">
+      <div class="cpa">
+        <i class="fa-sharp fa-solid fa-filter me-2"></i>
+        شارژ کیف پول (موجودی فعلی : @Model.WalletDto.Balance.ToString("N0") تومان)
+      </div>
+      <div class="tools">
+        <a href="javascript:void(0);" class="expand handle">
+          <i class="fal fa-angle-down"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="cm-content-body form excerpt">
+      <div class="card-body">
+
+        <form method="post"
+              asp-action="Charge"
+              asp-controller="Wallet"
+              asp-area="UserPanel"
+              asp-route-walletId="@Model.WalletDto.Id">
+          <input name="Description"
+                 type="hidden"
+                 value="شارژ کیف پول" />
+          <div class="row">
+
+            <div class="col-xl-3 col-sm-6">
+
+              <label class="form-label">مبلغ شارژ</label>
+
+              <input asp-for="ChargeRequest.Amount"
+                     type="number"
+                       name="Amount"
+                     min="1000"
+                     step="1000"
+                     required
+                     class="form-control mb-xl-0 mb-3"
+                     placeholder="مثال : 2,000,000 تومان" />
+
+              <span asp-validation-for="ChargeRequest.Amount"
+                    class="text-danger"></span>
+
+            </div>
+
+            <div class="col-xl-3 col-sm-6 align-self-end">
+
+              <button class="btn btn-primary me-2 pt-3"
+                      type="submit">
+
+                <i class="bi bi-arrow-up-circle me-1"></i>
+                شارژ کیف پول
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="filter cm-content-box box-primary">
+
+    <div class="content-title SlideToolHeader">
+      <div class="cpa">
+        <i class="fa-solid fa-file-lines me-1"></i>
+        لیست تراکنش‌های کیف پول
+      </div>
+
+      <div class="tools">
+        <a href="javascript:void(0);" class="expand handle">
+          <i class="fal fa-angle-down"></i>
+        </a>
+      </div>
+
+    </div>
+
+    <div class="cm-content-body form excerpt">
+
+      <div class="card-body pb-4">
+
+        <div class="table-responsive">
+
+          <table class="table">
+
+            <thead>
+            <tr>
+              <th>#</th>
+              <th>مبلغ</th>
+              <th>نوع تراکنش</th>
+              <th>وضعیت</th>
+              <th>تاریخ</th>
+              <th>درگاه</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            @if (!Model.Transactions.Items.Any())
+            {
+              <tr>
+                <td colspan="6" class="text-center">
+                  تراکنشی برای نمایش وجود ندارد
+                </td>
+              </tr>
+            }
+            else
+            {
+              var index = (Model.Transactions.PageNumber - 1) * Model.Transactions.PageSize;
+
+              foreach (var item in Model.Transactions.Items)
+              {
+                index++;
+
+                <tr>
+
+                  <td>@index</td>
+
+                  <td>
+                    @item.Amount.ToString("N0") @item.Currency
+                  </td>
+
+                  <td>
+                    @item.Type
+                  </td>
+
+                  <td>
+
+                    @if (item.Status == "Completed")
+                    {
+                      <span class="badge bg-success">موفق</span>
+                    }
+                    else if (item.Status == "Pending")
+                    {
+                      <span class="badge bg-warning">در انتظار</span>
+                    }
+                    else if (item.Status == "Failed")
+                    {
+                      <span class="badge bg-danger">ناموفق</span>
+                    }
+                    else
+                    {
+                      <span class="badge bg-secondary">@item.Status</span>
+                    }
+
+                  </td>
+
+                  <td>
+                    @item.TransactionDate.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                  </td>
+
+                  <td>
+                    @item.Gateway
+                  </td>
+
+                </tr>
+
+              }
+            }
+
+            </tbody>
+
+          </table>
+
+          <div class="d-flex align-items-center justify-content-between flex-wrap">
+
+            <small class="me-3">
+
+              صفحه @Model.Transactions.PageNumber
+              از @Model.Transactions.TotalPages
+
+              ، نمایش
+              @Model.Transactions.Items.Count
+              رکورد از
+              @Model.Transactions.TotalCount
+              رکورد
+
+            </small>
+
+            <nav>
+
+              <ul class="pagination mb-2 mb-sm-0">
+
+                @if (Model.Transactions.HasPreviousPage)
+                {
+                  <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Transactions.PageNumber - 1)">
+                      <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                  </li>
+                }
+
+                @for (int i = 1; i <= Model.Transactions.TotalPages; i++)
+                {
+                  <li class="page-item @(i == Model.Transactions.PageNumber ? "active" : "")">
+                    <a class="page-link"
+                       asp-route-page="@i">
+                      @i
+                    </a>
+                  </li>
+                }
+
+                @if (Model.Transactions.HasNextPage)
+                {
+                  <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Transactions.PageNumber + 1)">
+                      <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                  </li>
+                }
+
+              </ul>
+
+            </nav>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<script>
+  document.getElementById('amountInput').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+    if (value) {
+      e.target.value = parseInt(value).toLocaleString('en-US');
+    }
+  });
+
+  // Remove commas before submit
+  document.querySelector('form').addEventListener('submit', function() {
+    let input = document.getElementById('amountInput');
+    input.value = input.value.replace(/,/g, '');
+  });
+</script>

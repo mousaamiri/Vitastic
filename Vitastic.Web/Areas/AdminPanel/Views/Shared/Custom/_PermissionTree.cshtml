@@ -1,0 +1,33 @@
+﻿@* @model Vitastic.Core.Dtos.Admin.Roles.PermissionTreeItemViewModel *@
+@if (Model.Permission.Children.Any())
+{
+    
+    <ul class="permission-tree border border-black border-2 rounded-4" style="list-style: none;">
+        @foreach (var p in Model.Permission.Children)
+        {
+            <li class="permission-item">
+                <label class="form-check form-switch w-100 permission-label">
+                    <div style="padding: 6px;">
+                        <input
+                            name="SelectedPermissions"
+                            value="@p.Id"
+                            @(Model.SelectedPermissions.Contains(p.Id) ? "checked" : "")
+                            @(Model.IsReadOnly ? "disabled" : "")
+                            class="form-check-input permission-checkbox" type="checkbox" name="SelectedPermissions" value="@p.Id" />
+                        <span class="form-check-label">@p.DisplayName</span>
+                    </div>
+                </label>
+
+                @if (p.Children != null && p.Children.Any())
+                {
+                    <ul>
+                        @foreach (var child in p.Children)
+                        {
+                            @* <partial name="Shared/Custom/_PermissionTree" model="new PermissionTreeItemViewModel {Permission = child, SelectedPermissions = Model.SelectedPermissions,IsReadOnly = Model.IsReadOnly }" /> *@
+                        }
+                    </ul>
+                }
+            </li>
+        }
+    </ul>
+}

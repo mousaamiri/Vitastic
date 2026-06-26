@@ -1,0 +1,20 @@
+@model dynamic
+
+@{
+  var categories = Model.Categories as IReadOnlyList<Vitastic.Web.Models.DTOs.Category.CategoryDetailDto>;
+  int level = Model.Level;
+  string prefix = new string('—', level) + " ";
+}
+
+@if (categories != null && categories.Any())
+{
+  @foreach (var category in categories)
+  {
+    <option value="@category.Id">@prefix@category.Name</option>
+        
+    @if (category.SubCategories.Any())
+    {
+      @await Html.PartialAsync("_CategorySelectOptionsNested", new { Categories = category.SubCategories, Level = level + 1 })
+    }
+  }
+}

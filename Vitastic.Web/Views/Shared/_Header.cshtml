@@ -1,0 +1,71 @@
+<header  id="header" class="header d-flex align-items-center sticky-top">
+  <div class="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+    <!-- LOGO -->
+    <a href="@Url.Action("Index", "Home")" class="logo d-flex align-items-center">
+      <img src="~/shared/img/logo.webp" alt="ویتاستیک">
+      <h1 class="sitename">ویتاستیک</h1>
+    </a>
+
+    <nav class="navmenu">
+      @await Component.InvokeAsync("CourseCategoryMenu", new { maxItems = 6 })
+    </nav>
+
+    <!-- سمت چپ: Cart + Auth + Hamburger -->
+    <div id="headerbtns" class="d-flex align-items-center gap-3">
+
+      <!-- CART -->
+      <a href="@Url.Action("Index", "Cart")"
+         class="cart-icon position-relative d-flex align-items-center"
+         title="سبد خرید">
+        <i class="bi bi-cart3 fs-5"></i>
+        <span class="cart-count-badge badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+              style="display:none; font-size:0.65rem;">0</span>
+      </a>
+
+      <!-- AUTH -->
+      @if (User.Identity!.IsAuthenticated)
+      {
+        <div class="btn-group" role="group">
+
+          <a class="btn btn-getstarted d-flex align-items-center gap-2"
+             href="@Url.Action("Index", "UserProfile", new { area = "UserPanel" })"
+             title="پنل کاربری">
+            <img src="~/shared/img/avatar/account.svg" width="28" height="28" alt="حساب کاربری" />
+            <span class="d-none d-md-inline">@User.Identity.Name</span>
+          </a>
+
+          @if (User.IsInRole("Admin"))
+          {
+            <a class="btn btn-getstarted"
+               href="@Url.Action("Index", "Dashboard", new { area = "AdminPanel" })"
+               title="پنل مدیریت">
+              <i class="bi bi-gear d-xl-none"></i>
+              <span class="d-none d-xl-inline">پنل ادمین</span>
+            </a>
+          }
+
+          <button type="button" class="btn btn-getstarted" title="خروج"
+                  onclick="document.getElementById('logout-form').submit()">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+
+        </div>
+
+        <form id="logout-form" method="post"
+              asp-controller="Account" asp-action="Logout"
+              style="display:none;"></form>
+      }
+      else
+      {
+        <div class="btn-group" role="group">
+          <a href="@Url.Action("Login", "Account")" class="btn btn-getstarted">ورود</a>
+          <a href="@Url.Action("Register", "Account")" class="btn btn-getstarted">ثبت نام</a>
+        </div>
+      }
+
+    </div>
+  </div>
+</header>
+
+<script src="~/public/js/custom/cart.js" asp-append-version="true"></script>

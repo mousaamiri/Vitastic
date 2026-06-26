@@ -1,0 +1,691 @@
+@{
+    ViewData["CourseTitle"] = "Home Page";
+}
+
+<!-- Courses Hero Section -->
+<section id="courses-hero" class="courses-hero section light-background">
+
+	<div class="hero-content">
+		<div class="container">
+			<div class="row align-items-center">
+
+				<div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+					<div class="hero-text">
+						<h1>آینده خود را با دوره‌های آنلاین هدایت‌شده توسط متخصصان متحول کنید</h1>
+						<p>هزاران دوره با کیفیت بالا که توسط متخصصان صنعت طراحی شده‌اند را کشف کنید. با سرعت خودتان یاد بگیرید، مهارت‌های مورد تقاضا را کسب کنید و حرفه خود را از هر جای دنیا پیش ببرید.</p>
+
+						<div class="hero-stats">
+							<div class="stat-item">
+								<span class="number purecounter" data-purecounter-start="0" data-purecounter-end="50000" data-purecounter-duration="2"></span>
+								<span class="label">دانشجویان ثبت‌نام‌شده</span>
+							</div>
+							<div class="stat-item">
+								<span class="number purecounter" data-purecounter-start="0" data-purecounter-end="1200" data-purecounter-duration="2"></span>
+								<span class="label">دوره‌های تخصصی</span>
+							</div>
+							<div class="stat-item">
+								<span class="number purecounter" data-purecounter-start="0" data-purecounter-end="98" data-purecounter-duration="2"></span>
+								<span class="label">نرخ موفقیت %</span>
+							</div>
+						</div>
+
+						<div class="hero-buttons">
+							<a href="#courses" class="btn btn-primary">مرور دوره‌ها</a>
+							<a href="#about" class="btn btn-outline">بیشتر بدانید</a>
+						</div>
+
+						<div class="hero-features">
+							<div class="feature">
+								<i class="bi bi-shield-check"></i>
+								<span>برنامه‌های معتبر</span>
+							</div>
+							<div class="feature">
+								<i class="bi bi-clock"></i>
+								<span>دسترسی مادام‌العمر</span>
+							</div>
+							<div class="feature">
+								<i class="bi bi-people"></i>
+								<span>مربیان متخصص</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+					<div class="hero-image">
+						<div class="main-image">
+							<img src="~/shared/img/education/course-13.webp" alt="یادگیری آنلاین" class="img-fluid">
+						</div>
+
+						<div class="floating-cards">
+							<div class="course-card" data-aos="fade-up" data-aos-delay="300">
+								<div class="card-icon">
+									<i class="bi bi-code-slash"></i>
+								</div>
+								<div class="card-content">
+									<h6>توسعه وب</h6>
+									<span>2450 دانشجو</span>
+								</div>
+							</div>
+
+							<div class="course-card" data-aos="fade-up" data-aos-delay="400">
+								<div class="card-icon">
+									<i class="bi bi-palette"></i>
+								</div>
+								<div class="card-content">
+									<h6>طراحی UI/UX</h6>
+									<span>1890 دانشجو</span>
+								</div>
+							</div>
+
+							<div class="course-card" data-aos="fade-up" data-aos-delay="500">
+								<div class="card-icon">
+									<i class="bi bi-graph-up"></i>
+								</div>
+								<div class="card-content">
+									<h6>بازاریابی دیجیتال</h6>
+									<span>3200 دانشجو</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="hero-background">
+		<div class="bg-shapes">
+			<div class="shape shape-1"></div>
+			<div class="shape shape-2"></div>
+			<div class="shape shape-3"></div>
+		</div>
+	</div>
+
+</section>
+<!-- /Courses Hero Section -->
+<!-- Featured Courses Section -->
+<section id="featured-courses" class="featured-courses section">
+
+	<!-- Section CourseTitle -->
+	<div class="container section-title" data-aos="fade-up">
+		<h2>دوره‌های برجسته</h2>
+		<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+	</div>
+	<!-- End Section CourseTitle -->
+
+  @await Component.InvokeAsync("PopularCourses")
+
+</section><!-- /Featured Courses Section -->
+<!-- Course SelectCategories Section -->
+<section id="course-categories" class="course-categories section">
+
+	<!-- Section CourseTitle -->
+	<div class="container section-title" data-aos="fade-up">
+		<h2>دسته‌بندی‌های دوره</h2>
+		<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+	</div><!-- End Section CourseTitle -->
+
+	<div class="container" data-aos="fade-up" data-aos-delay="100">
+
+		<div class="row g-4">
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="100">
+				<a href="courses.html" class="category-card category-tech">
+					<div class="category-icon">
+						<i class="bi bi-laptop"></i>
+					</div>
+					<h5>علوم کامپیوتر</h5>
+					<span class="course-count">24 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="150">
+				<a href="courses.html" class="category-card category-business">
+					<div class="category-icon">
+						<i class="bi bi-briefcase"></i>
+					</div>
+					<h5>کسب‌وکار</h5>
+					<span class="course-count">18 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="200">
+				<a href="courses.html" class="category-card category-design">
+					<div class="category-icon">
+						<i class="bi bi-palette"></i>
+					</div>
+					<h5>طراحی</h5>
+					<span class="course-count">15 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="250">
+				<a href="courses.html" class="category-card category-health">
+					<div class="category-icon">
+						<i class="bi bi-heart-pulse"></i>
+					</div>
+					<h5>سلامت و پزشکی</h5>
+					<span class="course-count">12 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="300">
+				<a href="courses.html" class="category-card category-language">
+					<div class="category-icon">
+						<i class="bi bi-globe"></i>
+					</div>
+					<h5>زبان‌ها</h5>
+					<span class="course-count">21 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="350">
+				<a href="courses.html" class="category-card category-science">
+					<div class="category-icon">
+						<i class="bi bi-diagram-3"></i>
+					</div>
+					<h5>علوم</h5>
+					<span class="course-count">16 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="100">
+				<a href="courses.html" class="category-card category-marketing">
+					<div class="category-icon">
+						<i class="bi bi-megaphone"></i>
+					</div>
+					<h5>بازاریابی</h5>
+					<span class="course-count">19 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="150">
+				<a href="courses.html" class="category-card category-finance">
+					<div class="category-icon">
+						<i class="bi bi-graph-up-arrow"></i>
+					</div>
+					<h5>مالی</h5>
+					<span class="course-count">14 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="200">
+				<a href="courses.html" class="category-card category-photography">
+					<div class="category-icon">
+						<i class="bi bi-camera"></i>
+					</div>
+					<h5>عکاسی</h5>
+					<span class="course-count">11 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="250">
+				<a href="courses.html" class="category-card category-music">
+					<div class="category-icon">
+						<i class="bi bi-music-note-beamed"></i>
+					</div>
+					<h5>موسیقی</h5>
+					<span class="course-count">13 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="300">
+				<a href="courses.html" class="category-card category-engineering">
+					<div class="category-icon">
+						<i class="bi bi-gear"></i>
+					</div>
+					<h5>مهندسی</h5>
+					<span class="course-count">22 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="350">
+				<a href="courses.html" class="category-card category-law">
+					<div class="category-icon">
+						<i class="bi bi-journal-text"></i>
+					</div>
+					<h5>حقوق و قانونی</h5>
+					<span class="course-count">9 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="100">
+				<a href="courses.html" class="category-card category-culinary">
+					<div class="category-icon">
+						<i class="bi bi-cup-hot"></i>
+					</div>
+					<h5>هنرهای آشپزی</h5>
+					<span class="course-count">8 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="150">
+				<a href="courses.html" class="category-card category-sports">
+					<div class="category-icon">
+						<i class="bi bi-trophy"></i>
+					</div>
+					<h5>ورزش و تناسب اندام</h5>
+					<span class="course-count">17 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="200">
+				<a href="courses.html" class="category-card category-writing">
+					<div class="category-icon">
+						<i class="bi bi-pen"></i>
+					</div>
+					<h5>نویسندگی</h5>
+					<span class="course-count">10 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="250">
+				<a href="courses.html" class="category-card category-psychology">
+					<div class="category-icon">
+						<i class="bi bi-body-text"></i>
+					</div>
+					<h5>روان‌شناسی</h5>
+					<span class="course-count">12 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="300">
+				<a href="courses.html" class="category-card category-environment">
+					<div class="category-icon">
+						<i class="bi bi-tree"></i>
+					</div>
+					<h5>محیط زیست</h5>
+					<span class="course-count">7 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+			<div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="350">
+				<a href="courses.html" class="category-card category-communication">
+					<div class="category-icon">
+						<i class="bi bi-chat-dots"></i>
+					</div>
+					<h5>ارتباطات</h5>
+					<span class="course-count">15 دوره</span>
+				</a>
+			</div><!-- End Category Item -->
+
+		</div>
+
+	</div>
+
+</section><!-- /Course SelectCategories Section -->
+<!-- Featured InstructorFullNameFullNames Section -->
+<section id="featured-instructors" class="featured-instructors section">
+
+	<!-- Section CourseTitle -->
+	<div class="container section-title" data-aos="fade-up">
+		<h2>مربیان برجسته</h2>
+		<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+	</div><!-- End Section CourseTitle -->
+
+@await Component.InvokeAsync("TopInstructors")
+
+</section><!-- /Featured InstructorFullNameFullNames Section -->
+<!-- Testimonials Section -->
+<section id="testimonials" class="testimonials section">
+	<!-- Section CourseTitle -->
+	<div class="container section-title" data-aos="fade-up">
+		<h2>نظرات کاربران</h2>
+		<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+	</div><!-- End Section CourseTitle -->
+
+	<div class="container" data-aos="fade-up" data-aos-delay="100">
+
+		<div class="row">
+			<div class="col-12">
+				<div class="critic-reviews" data-aos="fade-up" data-aos-delay="300">
+					<div class="row">
+						<div class="col-md-4">
+							<div class="critic-review">
+								<div class="review-quote">"</div>
+								<div class="stars">
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+								</div>
+								<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+								<div class="critic-info">
+									<div class="critic-name">نیویورک تایمز</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="critic-review">
+								<div class="review-quote">"</div>
+								<div class="stars">
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-half"></i>
+								</div>
+								<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+								<div class="critic-info">
+									<div class="critic-name">واشنگتن پست</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="critic-review">
+								<div class="review-quote">"</div>
+								<div class="stars">
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+									<i class="bi bi-star-fill"></i>
+								</div>
+								<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+								<div class="critic-info">
+									<div class="critic-name">گاردین</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="testimonials-container">
+					<div class="swiper testimonials-slider init-swiper" data-aos="fade-up" data-aos-delay="400">
+						<script type="application/json" class="swiper-config">
+							{
+							  "loop": true,
+							  "speed": 600,
+							  "autoplay": {
+								"delay": 5000
+							  },
+							  "slidesPerView": 1,
+							  "spaceBetween": 30,
+							  "pagination": {
+								"el": ".swiper-pagination",
+								"type": "bullets",
+								"clickable": true
+							  },
+							  "breakpoints": {
+								"768": {
+								  "slidesPerView": 2
+								},
+								"992": {
+								  "slidesPerView": 3
+								}
+							  }
+							}
+						</script>
+
+						<div class="swiper-wrapper">
+							<div class="swiper-slide">
+								<div class="testimonial-item">
+									<div class="stars">
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+									</div>
+									<p>
+										لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.
+									</p>
+									<div class="testimonial-profile">
+										<img src="~/shared/img/person/person-f-1.webp" alt="نظردهنده" class="img-fluid rounded-circle">
+										<div>
+											<h3>جین اسمیت</h3>
+											<h4>علاقه‌مند به کتاب</h4>
+										</div>
+									</div>
+								</div>
+							</div><!-- End testimonial item -->
+
+							<div class="swiper-slide">
+								<div class="testimonial-item">
+									<div class="stars">
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+									</div>
+									<p>
+										لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.
+									</p>
+									<div class="testimonial-profile">
+										<img src="~/shared/img/person/person-m-2.webp" alt="نظردهنده" class="img-fluid rounded-circle">
+										<div>
+											<h3>مایکل جانسون</h3>
+											<h4>بلاگر علمی-تخیلی</h4>
+										</div>
+									</div>
+								</div>
+							</div><!-- End testimonial item -->
+
+							<div class="swiper-slide">
+								<div class="testimonial-item">
+									<div class="stars">
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-half"></i>
+									</div>
+									<p>
+										لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.
+									</p>
+									<div class="testimonial-profile">
+										<img src="~/shared/img/person/person-f-3.webp" alt="نظردهنده" class="img-fluid rounded-circle">
+										<div>
+											<h3>امیلی دیویس</h3>
+											<h4>رئیس باشگاه کتاب</h4>
+										</div>
+									</div>
+								</div>
+							</div><!-- End testimonial item -->
+
+							<div class="swiper-slide">
+								<div class="testimonial-item">
+									<div class="stars">
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+									</div>
+									<p>
+										لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.
+									</p>
+									<div class="testimonial-profile">
+										<img src="~/shared/img/person/person-m-4.webp" alt="نظردهنده" class="img-fluid rounded-circle">
+										<div>
+											<h3>رابرت ویلسون</h3>
+											<h4>نقدکننده ادبی</h4>
+										</div>
+									</div>
+								</div>
+							</div><!-- End testimonial item -->
+
+						</div>
+						<div class="swiper-pagination"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12 text-center" data-aos="fade-up">
+				<div class="overall-rating">
+					<div class="rating-number">4.8</div>
+					<div class="rating-stars">
+						<i class="bi bi-star-fill"></i>
+						<i class="bi bi-star-fill"></i>
+						<i class="bi bi-star-fill"></i>
+						<i class="bi bi-star-fill"></i>
+						<i class="bi bi-star-half"></i>
+					</div>
+					<p>بر اساس بیش از 230 نظر</p>
+					<div class="rating-platforms">
+						<span>گودریدز</span>
+						<span>آمازون</span>
+						<span>بارنز اند نوبل</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- /Testimonials Section -->
+<!-- Recent Blog Posts Section -->
+<section id="recent-blog-posts" class="recent-blog-posts section">
+
+	<!-- Section CourseTitle -->
+	<div class="container section-title" data-aos="fade-up">
+		<h2>پست‌های اخیر وبلاگ</h2>
+		<p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است.</p>
+	</div><!-- End Section CourseTitle -->
+
+	<div class="container" data-aos="fade-up" data-aos-delay="100">
+
+		<div class="row gy-4">
+
+			<div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+				<div class="card">
+					<div class="card-top d-flex align-items-center">
+						<img src="~/shared/img/person/person-f-12.webp" alt="نویسنده" class="rounded-circle me-2">
+						<span class="author-name">توسط اندی گلامر</span>
+						<span class="ms-auto likes"><i class="bi bi-heart"></i> 65</span>
+					</div>
+					<div class="card-img-wrapper">
+						<img src="~/shared/img/blog/blog-post-1.webp" alt="تصویر پست">
+					</div>
+					<div class="card-body">
+						<h5 class="card-title"><a href="blog-details.html">لورم ایپسوم متن ساختگی با تولید سادگی</a></h5>
+						<p class="card-text">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است...</p>
+					</div>
+				</div>
+			</div><!-- End Post Item Card -->
+
+			<div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+				<div class="card position-relative">
+					<div class="card-top d-flex align-items-center">
+						<img src="~/shared/img/person/person-f-13.webp" alt="نویسنده" class="rounded-circle me-2">
+						<span class="author-name">توسط دن ویلیامسون</span>
+						<span class="ms-auto likes"><i class="bi bi-heart"></i> 35</span>
+					</div>
+					<div class="card-img-wrapper">
+						<img src="~/shared/img/blog/blog-post-2.webp" alt="تصویر پست">
+					</div>
+					<div class="card-body">
+						<h5 class="card-title"><a href="blog-details.html">لورم ایپسوم متن ساختگی با تولید سادگی</a></h5>
+						<p class="card-text">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است...</p>
+					</div>
+				</div>
+			</div><!-- End Post Item Card -->
+
+			<div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+				<div class="card">
+					<div class="card-top d-flex align-items-center">
+						<img src="~/shared/img/person/person-m-10.webp" alt="نویسنده" class="rounded-circle me-2">
+						<span class="author-name">توسط جونز رابرت</span>
+						<span class="ms-auto likes"><i class="bi bi-heart"></i> 58</span>
+					</div>
+					<div class="card-img-wrapper">
+						<img src="~/shared/img/blog/blog-post-3.webp" alt="تصویر پست">
+					</div>
+					<div class="card-body">
+						<h5 class="card-title"><a href="blog-details.html">لورم ایپسوم متن ساختگی با تولید سادگی</a></h5>
+						<p class="card-text">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است...</p>
+					</div>
+				</div>
+			</div><!-- End Post Item Card -->
+
+		</div>
+
+	</div>
+
+</section><!-- /Recent Blog Posts Section -->
+<!-- Cta Section -->
+<section id="cta" class="cta section light-background">
+
+	<div class="container" data-aos="fade-up" data-aos-delay="100">
+
+		<div class="row align-items-center">
+
+			<div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
+				<div class="cta-content">
+					<h2>آینده خود را با دوره‌های آنلاین هدایت‌شده توسط متخصصان متحول کنید</h2>
+					<p>به هزاران یادگیرنده موفق بپیوندید که از طریق پلتفرم جامع آموزش آنلاین ما حرفه خود را ارتقا داده‌اند.</p>
+
+					<div class="features-list">
+						<div class="feature-item" data-aos="fade-up" data-aos-delay="300">
+							<i class="bi bi-check-circle-fill"></i>
+							<span>بیش از 20 مربی متخصص با تجربه صنعتی</span>
+						</div>
+						<div class="feature-item" data-aos="fade-up" data-aos-delay="350">
+							<i class="bi bi-check-circle-fill"></i>
+							<span>گواهینامه تکمیل برای هر دوره</span>
+						</div>
+						<div class="feature-item" data-aos="fade-up" data-aos-delay="400">
+							<i class="bi bi-check-circle-fill"></i>
+							<span>دسترسی 24/7 به مطالب و منابع دوره</span>
+						</div>
+						<div class="feature-item" data-aos="fade-up" data-aos-delay="450">
+							<i class="bi bi-check-circle-fill"></i>
+							<span>تمرین‌های تعاملی و پروژه‌های دنیای واقعی</span>
+						</div>
+					</div>
+
+					<div class="cta-actions" data-aos="fade-up" data-aos-delay="500">
+            <a href="courses.html" class="btn btn-primary">مرور دوره‌ها</a>
+            @Html.ActionLink("اکنون ثبت نام کنید", "Register", "Account", null, new { @class = "btn btn-outline" })
+					</div>
+
+					<div class="stats-row" data-aos="fade-up" data-aos-delay="400">
+						<div class="stat-item">
+							<h3><span data-purecounter-start="0" data-purecounter-end="15000" data-purecounter-duration="2" class="purecounter"></span>+</h3>
+							<p>دانشجویان ثبت‌نام‌شده</p>
+						</div>
+						<div class="stat-item">
+							<h3><span data-purecounter-start="0" data-purecounter-end="150" data-purecounter-duration="2" class="purecounter"></span>+</h3>
+							<p>دوره‌های موجود</p>
+						</div>
+						<div class="stat-item">
+							<h3><span data-purecounter-start="0" data-purecounter-end="98" data-purecounter-duration="2" class="purecounter"></span>%</h3>
+							<p>نرخ موفقیت</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
+				<div class="cta-image">
+					<img src="~/shared/img/education/course-4.webp" alt="پلتفرم یادگیری آنلاین" class="img-fluid">
+					<div class="floating-element student-card" data-aos="zoom-in" data-aos-delay="600">
+						<div class="card-content">
+							<i class="bi bi-person-check-fill"></i>
+							<div class="text">
+								<span class="number">2,450</span>
+								<span class="label">دانشجویان جدید این ماه</span>
+							</div>
+						</div>
+					</div>
+					<div class="floating-element course-card" data-aos="zoom-in" data-aos-delay="700">
+						<div class="card-content">
+							<i class="bi bi-play-circle-fill"></i>
+							<div class="text">
+								<span class="number">50+</span>
+								<span class="label">ساعات محتوا</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+</section><!-- /Cta Section -->

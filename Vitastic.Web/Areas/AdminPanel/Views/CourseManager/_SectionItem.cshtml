@@ -1,0 +1,134 @@
+@model Vitastic.Web.Models.DTOs.Course.SectionDto
+@{
+  var index = (int)ViewData["Index"]!;
+}
+
+<div class="section-item mb-4">
+  <div class="card border-0 shadow-sm"
+       style="border-radius: 16px; overflow: hidden; border-right: 5px solid #0d6efd;">
+    <div class="card-header bg-gradient-light d-flex justify-content-between align-items-center py-3 px-4">
+      <div class="flex-grow-1 me-3">
+        <input type="hidden" asp-for="Id" name="Sections[@index].Id" />
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;">
+            <i class="fas fa-folder text-primary"></i>
+          </span>
+          <input type="text"
+                 asp-for="Title"
+                 name="Sections[@index].Title"
+                 class="form-control border-start-0 shadow-sm"
+                 style="border-radius: 0 10px 10px 0;"
+                 placeholder="عنوان سکشن"
+                 required />
+        </div>
+        <input type="hidden" asp-for="DisplayOrder" name="Sections[@index].DisplayOrder" />
+      </div>
+      <div class="btn-group shadow-sm">
+        <button type="button" class="btn btn-danger remove-section-btn px-3">
+          <i class="fas fa-trash me-1"></i>
+          حذف
+        </button>
+        <button type="button" class="btn btn-success add-episode-btn px-3">
+          <i class="fas fa-plus me-1"></i>
+          اپیزود
+        </button>
+      </div>
+    </div>
+    <div class="card-body episodes-container p-4 bg-light">
+      @if (Model.Episodes.Any())
+      {
+        @for (int j = 0; j < Model.Episodes.Count; j++)
+        {
+          var episode = Model.Episodes[j];
+          <input type="hidden" name="Sections[@index].Episodes[@j].Duration" value="@episode.Duration" />
+          <div class="episode-item border-0 rounded-3 p-3 mb-3 bg-white shadow-sm">
+            <div class="row g-3 align-items-end">
+              <!-- عنوان اپیزود -->
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                  <i class="fas fa-video me-1"></i>
+                  عنوان اپیزود
+                </label>
+                <input type="hidden" name="Sections[@index].Episodes[@j].Id" value="@episode.Id" />
+                <input type="text"
+                       name="Sections[@index].Episodes[@j].Title"
+                       value="@episode.Title"
+                       class="form-control shadow-sm"
+                       style="border-radius: 10px;"
+                       placeholder="عنوان اپیزود"
+                       required />
+              </div>
+
+              <!-- ترتیب نمایش -->
+              <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                  <i class="fas fa-sort-numeric-down me-1"></i>
+                  ترتیب
+                </label>
+                <input type="number"
+                       name="Sections[@index].Episodes[@j].DisplayOrder"
+                       value="@episode.DisplayOrder"
+                       class="form-control shadow-sm bg-light"
+                       style="border-radius: 10px;"
+                       readonly />
+              </div>
+
+              <!-- قیمت -->
+              <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                  <i class="fas fa-dollar-sign me-1"></i>
+                  قیمت (تومان)
+                </label>
+                <input type="number"
+                       name="Sections[@index].Episodes[@j].Price"
+                       value="@episode.Price"
+                       class="form-control shadow-sm"
+                       style="border-radius: 10px;"
+                       min="0"
+                       placeholder="0" />
+              </div>
+
+              <!-- دکمه حذف -->
+              <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm remove-episode-btn shadow-sm w-100"
+                        style="border-radius: 10px;">
+                  <i class="fas fa-trash me-1"></i>
+                  حذف
+                </button>
+              </div>
+            </div>
+
+            <!-- فایل ویدئو -->
+            <div class="row g-3 mt-2">
+              <div class="col-md-12">
+                <label class="form-label small fw-semibold text-muted mb-2">
+                  <i class="fas fa-file-video me-1"></i>
+                  فایل ویدئو
+                </label>
+                <input type="file"
+                       name="Sections[@index].Episodes[@j].VideoFile"
+                       class="form-control shadow-sm"
+                       style="border-radius: 10px;"
+                       accept="video/*" />
+                @if (!string.IsNullOrEmpty(episode.VideoFileName))
+                {
+                  <small class="text-success d-block mt-1">
+                    <i class="fas fa-check-circle me-1"></i>
+                    ویدئو موجود: <strong>@episode.VideoFileName</strong>
+                  </small>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+      else
+      {
+        <div class="alert alert-secondary border-0 shadow-sm text-center mb-0" style="border-radius: 12px;">
+          <i class="fas fa-film me-2"></i>
+          هنوز اپیزودی اضافه نشده است.
+        </div>
+      }
+    </div>
+  </div>
+</div>

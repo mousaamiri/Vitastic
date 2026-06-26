@@ -1,0 +1,211 @@
+@model Vitastic.Web.Models.DTOs.Course.CourseFilterDto
+
+@* ============================================ *@
+@* PARTIAL: Active Filter Tags                  *@
+@* Shows currently applied filters as           *@
+@* removable tags with a "clear all" option     *@
+@* ============================================ *@
+
+@{
+  #region Check if any filter is active
+
+  var hasAnyFilter = !string.IsNullOrEmpty(Model.SearchTerm)
+                     || Model.CategoryId.HasValue
+                     || !string.IsNullOrEmpty(Model.Level.ToString())
+                     || Model.MinPrice.HasValue
+                     || Model.MaxPrice.HasValue
+                     || Model.IsFree == true
+                     || Model.HasCertificate == true;
+  
+  #endregion
+}
+
+@if (hasAnyFilter)
+{
+  <div class="active-filters" id="activeFilters">
+
+    @* ── Label ── *@
+    <span class="active-filters__label">
+      <i class="bi bi-funnel-fill"></i>
+      فیلترهای فعال:
+    </span>
+
+    @* ── Filter Tags ── *@
+    <div class="active-filters__tags">
+
+      @* ─────────────────────────── *@
+      @* #region Search Tag          *@
+      @* ─────────────────────────── *@
+      @if (!string.IsNullOrEmpty(Model.SearchTerm))
+      {
+        <span class="filter-tag" data-filter="Search">
+          <i class="bi bi-search"></i>
+          جستجو: «@Model.SearchTerm»
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="Search"
+                  title="حذف فیلتر جستجو">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+      @* ─────────────────────────── *@
+      @* #region Category Tag        *@
+      @* ─────────────────────────── *@
+      @if (Model.CategoryId.HasValue)
+      {
+        <span class="filter-tag" data-filter="CategoryId">
+          <i class="bi bi-folder"></i>
+          دسته‌بندی: @(Model.CategoryName ?? $"دسته {Model.CategoryId}")
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="CategoryId"
+                  title="حذف فیلتر دسته‌بندی">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+      @* ─────────────────────────── *@
+      @* #region Level Tag           *@
+      @* ─────────────────────────── *@
+      @if (!string.IsNullOrEmpty(Model.Level.ToString()))
+      {
+        <span class="filter-tag" data-filter="Level">
+          <i class="bi bi-bar-chart"></i>
+          سطح: @GetLevelDisplayText(Model.Level.ToString())
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="Level"
+                  title="حذف فیلتر سطح">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+      @* ─────────────────────────── *@
+      @* #region UnitPrice Range Tag     *@
+      @* ─────────────────────────── *@
+      @if (Model.MinPrice.HasValue || Model.MaxPrice.HasValue)
+      {
+        <span class="filter-tag" data-filter="UnitPrice">
+          <i class="bi bi-currency-dollar"></i>
+          @GetPriceRangeText(Model.MinPrice, Model.MaxPrice)
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="UnitPrice"
+                  title="حذف فیلتر قیمت">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+      @* ─────────────────────────── *@
+      @* #region IsFree Tag          *@
+      @* ─────────────────────────── *@
+      @if (Model.IsFree == true)
+      {
+        <span class="filter-tag" data-filter="IsFree">
+          <i class="bi bi-gift"></i>
+          فقط دوره‌های رایگان
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="IsFree"
+                  title="حذف فیلتر رایگان">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+      @* ─────────────────────────── *@
+      @* #region HasCertificate Tag  *@
+      @* ─────────────────────────── *@
+      @if (Model.HasCertificate == true)
+      {
+        <span class="filter-tag" data-filter="HasCertificate">
+          <i class="bi bi-award"></i>
+          دارای گواهینامه
+          <button type="button"
+                  class="filter-tag__remove"
+                  data-remove-filter="HasCertificate"
+                  title="حذف فیلتر گواهینامه">
+            &times;
+          </button>
+        </span>
+      }
+      @* #endregion *@
+
+    </div>
+
+    @* ── Clear All Button ── *@
+    <a href="@Url.Action("Index", "Course")"
+       class="active-filters__clear"
+       title="حذف تمام فیلترها">
+      <i class="bi bi-x-circle"></i>
+      حذف همه
+    </a>
+
+  </div>
+}
+
+@* ============================================ *@
+@* #region Helper Functions                     *@
+@* ============================================ *@
+
+@functions {
+
+  /// <summary>
+  /// Converts level code to Persian display text
+  /// </summary>
+  private string GetLevelDisplayText(string level)
+  {
+    return level?.ToLower() switch
+    {
+      "beginner" => "مقدماتی",
+      "intermediate" => "متوسط",
+      "advanced" => "پیشرفته",
+      "expert" => "تخصصی",
+      "all" => "همه سطوح",
+      _ => level ?? "نامشخص"
+    };
+  }
+
+  /// <summary>
+  /// Builds a human-readable price range text in Persian
+  /// </summary>
+  private string GetPriceRangeText(decimal? minPrice, decimal? maxPrice)
+  {
+    if (minPrice.HasValue && maxPrice.HasValue)
+    {
+      return $"قیمت: {FormatPrice(minPrice.Value)} تا {FormatPrice(maxPrice.Value)}";
+    }
+
+    if (minPrice.HasValue)
+    {
+      return $"قیمت: از {FormatPrice(minPrice.Value)}";
+    }
+
+    if (maxPrice.HasValue)
+    {
+      return $"قیمت: تا {FormatPrice(maxPrice.Value)}";
+    }
+
+    return "قیمت";
+  }
+
+  /// <summary>
+  /// Formats price with thousands separator and currency suffix
+  /// </summary>
+  private string FormatPrice(decimal price)
+  {
+    return price.ToString("N0") + " تومان";
+  }
+}
+
+@* #endregion *@

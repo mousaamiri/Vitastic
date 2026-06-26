@@ -1,0 +1,122 @@
+@model Vitastic.Web.Infrastructure.ApiClient.PaginatedData<Vitastic.Web.Models.DTOs.Order.OrderDto>?
+
+@if (TempData["ErrorMessage"] != null || Model is null)
+{
+  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+else
+{
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="jobs-tab-pane" role="tabpanel" aria-labelledby="jobs-tab" tabindex="0">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive active-projects style-1">
+            <div id="empoloyees-tblwrapper_wrapper" class="dataTables_wrapper no-footer">
+              <table id="empoloyees-tblwrapper" class="table dataTable no-footer"
+                     aria-describedby="empoloyees-tblwrapper_info">
+                <thead>
+                  <tr>
+                    <th class="sorting sorting_asc " tabindex="0" aria-controls="empoloyees-tblwrapper"
+                        rowspan="1" colspan="1" aria-sort="ascending"
+                        aria-label="نام خریدار: activate to sort column descending"
+                        style="width: 143.413px; text-align:start;">
+                      نام خریدار
+                    </th>
+                    <th class="sorting sorting_asc " tabindex="0" aria-controls="empoloyees-tblwrapper"
+                        rowspan="1" colspan="1" aria-sort="ascending"
+                        aria-label="شماره سفارش: activate to sort column descending"
+                        style="width: 143.413px; text-align:start;">
+                      شماره سفارش
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="مجموع خرید: activate to sort column ascending"
+                        style="width: 97.5625px; text-align:start;">
+                      مجموع خرید
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="مبلغ نهایی خرید: activate to sort column ascending"
+                        style="width: 103.875px; text-align:start;">
+                      مبلغ نهایی خرید
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="اقدامات: activate to sort column ascending"
+                        style="width: 146.312px; text-align:start;">
+                      اقدامات
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var order in Model!.Items)
+                  {
+                    <tr class="odd">
+                      <td>@(order.UserFullName)</td>
+                      <td class="text-black sorting_1">@order.OrderNumber</td>
+                      <td class="text-black sorting_1">@order.ItemsTotal</td>
+                      <td class="text-black sorting_1">@order.FinalAmount</td>
+                      <td>
+                        <a href="javascript:void(0);" data-order-id="@order.Id" class="btn btn-primary light btn-sharp edit-order-btn">
+                          <svg class="icon-box icon-box-xs bg-primary-light" width="8" height="8" viewBox="0 0 16 16"
+                               fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.16492 13.6286H14" stroke="#0D99FF" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M8.52001 2.52986C9.0371 1.91186 9.96666 1.82124 10.5975 2.32782C10.6324 2.35531 11.753 3.22586 11.753 3.22586C12.446 3.64479 12.6613 4.5354 12.2329 5.21506C12.2102 5.25146 5.87463 13.1763 5.87463 13.1763C5.66385 13.4393 5.34389 13.5945 5.00194 13.5982L2.57569 13.6287L2.02902 11.3149C1.95244 10.9895 2.02902 10.6478 2.2398 10.3849L8.52001 2.52986Z"
+                                  stroke="#0D99FF" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M7.34723 4.00059L10.9821 6.79201" stroke="#0D99FF" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                          </svg>
+                        </a>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="mainModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" id="mainModalContent">
+        <!-- replace with partial view -->
+      </div>
+    </div>
+  </div>
+}
+
+@section AdditionalScript
+{
+  <!-- Moment.js  -->
+  <script src="~/shared/panel/vendor/moment/moment.min.js"></script>
+
+  <!-- Bootstrap Daterangepicker -->
+  <script src="~/shared/panel/vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      // Event delegation برای دکمه‌های ویرایش
+      $(document).on('click', '.edit-order-btn', function(e) {
+        e.preventDefault();
+        const orderId = $(this).data('order-id');
+        console.log(`Order id for edit is ${orderId}`);
+
+        $.ajax({
+          url: `/admin/OrderManager/Details/${orderId}`,
+          type: "GET",
+          success: function (html) {
+            console.log("success ...");
+            $('#mainModalContent').html(html);
+            $('#mainModal').modal('show');
+          },
+          error: function (xhr, status, error) {
+            console.log("error ...", error);
+            alert("خطا در دریافت فرم");
+          }
+        });
+      });
+    });
+  </script>
+}

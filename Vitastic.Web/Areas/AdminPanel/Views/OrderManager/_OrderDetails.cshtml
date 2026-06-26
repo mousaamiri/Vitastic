@@ -1,0 +1,349 @@
+@using Vitastic.Web.Models.DTOs.Order
+@model Vitastic.Web.Models.DTOs.Order.OrderDetailApiDto
+
+@{
+  Layout = "";
+}
+
+@if (TempData["ErrorMessage"] is not null)
+{
+  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+else
+{
+  <!-- محتوای فعلی صفحه جزئیات سفارش -->
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>جزئیات سفارش #@Model.OrderNumber</h5>
+      <button type="button" class="btn btn-primary" id="openModalBtn">
+        تغییر وضعیت سفارش
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- اطلاعات سفارش -->
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>وضعیت فعلی:</strong> <span class="badge bg-info">@Model.Status</span></p>
+          <p><strong>مشتری:</strong> @Model.UserFullName</p>
+          <p><strong>ایمیل:</strong> @Model.UserEmail</p>
+          <p><strong>تلفن:</strong> @Model.PhoneNumber</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>مبلغ نهایی:</strong> @Model.FinalAmount.ToString("N0") تومان</p>
+          <p><strong>روش پرداخت:</strong> @Model.PaymentMethod</p>
+          <p><strong>تاریخ ثبت:</strong> @Model.CreatedAt.ToString("yyyy/MM/dd HH:mm")</p>
+        </div>
+      </div>
+
+      @if (!string.IsNullOrEmpty(Model.AdminNote))
+      {
+        <div class="alert alert-warning mt-3">
+          <strong>یادداشت ادمین:</strong> @Model.AdminNote
+        </div>
+      }
+
+      @if (!string.IsNullOrEmpty(Model.CustomerNote))
+      {
+        <div class="alert alert-info mt-3">
+          <strong>یادداشت مشتری:</strong> @Model.CustomerNote
+        </div>
+      }
+
+      <!-- آیتم‌های سفارش -->
+      <div class="mt-4">
+        <h6 class="mb-3">آیتم‌های سفارش</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>دوره</th>
+                <th>مدرس</th>
+                <th>قیمت واحد</th>
+                <th>تخفیف</th>
+                <th>قیمت نهایی</th>
+                <th>وضعیت دسترسی</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var item in Model.Items)
+              {
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      @if (!string.IsNullOrEmpty(item.ThumbnailUrl))
+                      {
+                        <img src="@item.ThumbnailUrl" alt="@item.CourseTitle" class="rounded me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                      }
+                      <span>@item.CourseTitle</span>
+                    </div>
+                  </td>
+                  <td>@(item.InstructorFullName ?? "-")</td>
+                  <td>@item.UnitPrice.ToString("N0") تومان</td>
+                  <td>
+                    @if (item.HasDiscount)
+                    {
+                      <span class="text-danger">
+                        @item.DiscountAmount.ToString("N0") تومان
+                        <small>(@item.DiscountPercentage.ToString("0")%)</small>
+                      </span>
+                    }
+                    else
+                    {
+                      <span>-</span>
+                    }
+                  </td>
+                  <td><strong>@item.FinalPrice.ToString("N0") تومان</strong></td>
+                  <td>
+                    @if (item.IsAccessGranted)
+                    {
+                      <span class="badge bg-success">فعال</span>
+                      @if (item.AccessGrantedAt.HasValue)
+                      {
+                        <br>
+                        <small class="text-muted">@item.AccessGrantedAt.Value.ToString("yyyy/MM/dd")</small>
+                      }
+                    }
+                    else if (item.AccessRevokedAt.HasValue)
+                    {
+                      <span class="badge bg-danger">لغو شده</span>
+                      <br>
+                      <small class="text-muted">@item.AccessRevokedAt.Value.ToString("yyyy/MM/dd")</small>
+                    }
+                    else
+                    {
+                      <span class="badge bg-secondary">غیرفعال</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- خلاصه مالی -->
+      <div class="row mt-4">
+        <div class="col-md-6 ms-auto">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title mb-3">خلاصه مالی</h6>
+              <table class="table table-sm mb-0">
+                <tbody>
+                  <tr>
+                    <td>مجموع آیتم‌ها:</td>
+                    <td class="text-end">@Model.ItemsTotal.ToString("N0") تومان</td>
+                  </tr>
+                  @if (Model.DiscountAmount > 0)
+                  {
+                    <tr class="text-danger">
+                      <td>تخفیف:</td>
+                      <td class="text-end">-@Model.DiscountAmount.ToString("N0") تومان</td>
+                    </tr>
+                  }
+                  @if (!string.IsNullOrEmpty(Model.DiscountCode))
+                  {
+                    <tr>
+                      <td colspan="2" class="text-muted">
+                        <small>کد تخفیف: <strong>@Model.DiscountCode</strong></small>
+                      </td>
+                    </tr>
+                  }
+                  @if (Model.TaxAmount > 0)
+                  {
+                    <tr>
+                      <td>مالیات:</td>
+                      <td class="text-end">@Model.TaxAmount.ToString("N0") تومان</td>
+                    </tr>
+                  }
+                  @if (Model.ShippingAmount > 0)
+                  {
+                    <tr>
+                      <td>هزینه ارسال:</td>
+                      <td class="text-end">@Model.ShippingAmount.ToString("N0") تومان</td>
+                    </tr>
+                  }
+                  <tr class="table-active fw-bold">
+                    <td>مبلغ نهایی:</td>
+                    <td class="text-end text-primary">@Model.FinalAmount.ToString("N0") تومان</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal تغییر وضعیت -->
+  <div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="changeStatusModalLabel">تغییر وضعیت سفارش</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="changeStatusForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="newStatus" class="form-label">وضعیت جدید <span class="text-danger">*</span></label>
+              <select class="form-select" id="newStatus" name="newStatus" required>
+                <option value="">-- انتخاب وضعیت جدید --</option>
+                @{
+                  var statuses = new Dictionary<OrderStatusDto, string>
+                  {
+                    { OrderStatusDto.Processing, "در حال پردازش" },
+                    { OrderStatusDto.Completed, "تکمیل شده" },
+                    { OrderStatusDto.Cancelled, "لغو شده" },
+                    { OrderStatusDto.Refunded, "بازپرداخت شده" },
+                    { OrderStatusDto.Failed, "ناموفق" }
+                  };
+
+                  foreach (var status in statuses)
+                  {
+                    var isSelected = (int)Model.Status == (int)status.Key;
+                    <option value="@((int)status.Key)" selected="@isSelected">
+                      @status.Value
+                    </option>
+                  }
+                }
+              </select>
+
+
+            </div>
+            <div class="mb-3">
+              <label for="adminNote" class="form-label">یادداشت ادمین</label>
+              <textarea class="form-control" id="adminNote" name="adminNote" rows="4" placeholder="توضیحات مربوط به تغییر وضعیت را وارد کنید...">@Model.AdminNote</textarea>
+              <small class="form-text text-muted">این یادداشت برای مدیران قابل مشاهده است</small>
+            </div>
+            <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner" role="status" aria-hidden="true"></span>
+              <span id="btnText">ثبت تغییرات</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+      console.log('Script loaded');
+      
+      const form = document.getElementById('changeStatusForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const errorDiv = document.getElementById('errorMessage');
+      const statusSelect = document.getElementById('newStatus');
+      const adminNoteTextarea = document.getElementById('adminNote');
+      const modalElement = document.getElementById('changeStatusModal');
+      const openModalBtn = document.getElementById('openModalBtn');
+
+      console.log('Modal element:', modalElement);
+      console.log('Open button:', openModalBtn);
+
+      if (!modalElement) {
+          console.error('Modal element not found!');
+          return;
+      }
+
+      // مدال رو دستی initialize کن
+      let modal;
+      try {
+          modal = new bootstrap.Modal(modalElement);
+          console.log('Modal initialized:', modal);
+      } catch (error) {
+          console.error('Error initializing modal:', error);
+          return;
+      }
+
+      // دکمه باز کردن مدال
+      if (openModalBtn) {
+          openModalBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              console.log('Button clicked, showing modal');
+              modal.show();
+          });
+      }
+
+      // ارسال فرم
+      form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          const status = statusSelect.value;
+          const adminNote = adminNoteTextarea.value.trim();
+
+          if (!status) {
+              showError('لطفا وضعیت جدید را انتخاب کنید');
+              return;
+          }
+
+          setLoading(true);
+          hideError();
+
+          try {
+            debugger
+                const response = await fetch('@Url.Action("ChangeStatus", "OrderManager", new { area = "AdminPanel", orderId = Model.Id })', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                        Status: parseInt(status),
+                      adminNote: adminNote || null
+                  })
+              });
+
+              const result = await response.json();
+
+              if (response.ok && result.success) {
+                  modal.hide();
+                  alert(result.message || 'وضعیت سفارش با موفقیت تغییر یافت');
+                  setTimeout(() => {
+                      location.reload();
+                  }, 1000);
+              } else {
+                  showError(result.message || 'خطا در تغییر وضعیت سفارش');
+                  setLoading(false);
+              }
+          } catch (error) {
+              console.error('Error:', error);
+              showError('خطا در ارتباط با سرور. لطفا دوباره تلاش کنید');
+              setLoading(false);
+          }
+      });
+
+      // وقتی مدال بسته شد
+      modalElement.addEventListener('hidden.bs.modal', function () {
+          form.reset();
+          hideError();
+          setLoading(false);
+      });
+
+      function setLoading(isLoading) {
+          submitBtn.disabled = isLoading;
+          if (isLoading) {
+              loadingSpinner.classList.remove('d-none');
+              btnText.textContent = 'در حال ارسال...';
+          } else {
+              loadingSpinner.classList.add('d-none');
+              btnText.textContent = 'ثبت تغییرات';
+          }
+      }
+
+      function showError(message) {
+          errorDiv.textContent = message;
+          errorDiv.classList.remove('d-none');
+      }
+
+      function hideError() {
+          errorDiv.classList.add('d-none');
+      }
+  })();
+  </script>
+}

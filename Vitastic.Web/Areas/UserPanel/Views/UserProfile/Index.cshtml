@@ -1,0 +1,240 @@
+@model Vitastic.Web.Models.DTOs.Auth.UserDetailDto
+<div class="row">
+  <div class="col-4">
+    <div class="card card-profile">
+      <div class="admin-user">
+        <div class="img-wrraper">
+          <div class="">
+            <img src="@Url.Content(Model.Avatar)" alt="" class="rounded-circle">
+          </div>
+          <a class="icon-wrapper" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#avatarModal">
+            <i class="fa-solid fa-pencil"></i>
+          </a>
+        </div>
+        <div class="user-details">
+          <div class="title">
+            <a target="_blank" href="">
+              <h4>@($"{Model.FirstName} {Model.LastName}")</h4>
+            </a>
+            <h6>@Model.UserName</h6>
+          </div>
+          <ul class="user-social-links">
+            <li><a href="javascript:void(0)" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></li>
+            <li><a href="javascript:void(0)" target="_blank"><i class="fa-brands fa-skype"></i></a></li>
+            <li><a href="javascript:void(0)" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
+            <li><a href="javascript:void(0)" target="_blank"><i class="fa-brands fa-instagram"></i></a></li>
+            <li><a href="javascript:void(0)" target="_blank"><i class="fa fa-rss"></i></a></li>
+          </ul>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-8">
+    <div class="row">
+      <div class="col-xl-12">
+        <div class="card">
+          <div class="card-body profile-accordion pb-0">
+            <div class="accordion" id="accordionExample1">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne1">
+                  <button class="accordion-button border-0" type="button" data-bs-toggle="collapse"
+                          data-bs-target="#collapseOne1" aria-expanded="true" aria-controls="collapseOne1">
+                    اطلاعات من
+                  </button>
+                </h2>
+                <div id="collapseOne1" class="accordion-collapse collapse show"
+                     aria-labelledby="headingOne1" data-bs-parent="#accordionExample1">
+                  <div class="accordion-body">
+                    <div class="about-me">
+                      <ul>
+                        <li>
+                          <i class="fa-solid fa-briefcase"></i>
+                          <div>
+                            <h6>نام کاربری</h6>
+                            <span>@(string.IsNullOrEmpty(Model.UserName?.Trim()) ? "ثبت نشده" : Model.UserName)</span>
+                          </div>
+                        </li>
+
+                        <li>
+                          <i class="fa-solid fa-book"></i>
+                          <div>
+                            <h6>نام و نام خانوادگی</h6>
+                            <span>
+                              @{
+                                var fullName = $"{Model.FirstName?.Trim()} {Model.LastName?.Trim()}".Trim();
+                              }
+                              @(string.IsNullOrEmpty(fullName) ? "ثبت نشده" : fullName)
+                            </span>
+                          </div>
+                        </li>
+
+                        <li>
+                          <i class="fa-solid fa-envelope"></i>
+                          <div>
+                            <h6>ایمیل</h6>
+                            <span>@(string.IsNullOrEmpty(Model.Email?.Trim()) ? "ثبت نشده" : Model.Email)</span>
+                          </div>
+                        </li>
+
+                        <li>
+                          <i class="fa-solid fa-phone"></i>
+                          <div>
+                            <h6>شماره تلفن</h6>
+                            <span>@(string.IsNullOrEmpty(Model.PhoneNumber?.Trim()) ? "ثبت نشده" : Model.PhoneNumber)</span>
+                          </div>
+                        </li>
+
+                        <li>
+                          <i class="fa-solid fa-wallet"></i>
+                          <div>
+                            <h6>مبلغ کیف پول</h6>
+                            <span>
+                              @($"{Model.WalletBalance:N0} تومان")
+                            </span>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal for Avatar Upload -->
+<div class="modal fade" id="avatarModal" tabindex="-1" aria-labelledby="avatarModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="avatarModalLabel">تغییر تصویر پروفایل</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formUploadAvatar" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="avatarFile" class="form-label">انتخاب تصویر</label>
+            <input type="file" class="form-control" id="avatarFile" name="avatarFile" accept="image/*" required>
+          </div>
+          <div id="avatarPreview" class="text-center mb-3" style="display:none;">
+            <img id="previewImage" src="" alt="پیش‌نمایش" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+          </div>
+          <div id="errorAvatar" class="alert alert-danger d-none"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+        <button type="button" class="btn btn-primary" id="btnUploadAvatar">
+          <span id="spinnerAvatar" class="spinner-border spinner-border-sm d-none" role="status"></span>
+          ذخیره تصویر
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  //#region Avatar Upload
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const updateAvatarUrl = '@Url.Action("UpdateUserAvatarFile", "UserProfile", new { area = "UserPanel" })';
+
+    const avatarInput = document.getElementById('avatarFile');
+    const previewDiv = document.getElementById('avatarPreview');
+    const previewImg = document.getElementById('previewImage');
+    const avatarModalElement = document.getElementById('avatarModal');
+    const avatarModal = new bootstrap.Modal(avatarModalElement);
+    const btnUpload = document.getElementById('btnUploadAvatar');
+    const errorDiv = document.getElementById('errorAvatar');
+    const spinner = document.getElementById('spinnerAvatar');
+    const profileImage = document.querySelector('.img-wrraper img'); // تصویر فعلی پروفایل
+
+    // Preview selected image
+    avatarInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) {
+        previewDiv.style.display = 'none';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        previewImg.src = event.target.result;
+        previewDiv.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Upload avatar
+    btnUpload.addEventListener('click', async function() {
+      errorDiv.classList.add('d-none');
+      spinner.classList.remove('d-none');
+      btnUpload.disabled = true;
+
+      try {
+        const file = avatarInput.files[0];
+        if (!file) {
+          throw new Error('لطفاً یک تصویر انتخاب کنید.');
+        }
+
+        // Validate file type (optional but recommended)
+        if (!file.type.startsWith('image/')) {
+          throw new Error('فقط فایل‌های تصویری مجاز هستند.');
+        }
+
+        const formData = new FormData();
+        formData.append('avatarFile', file);
+        debugger
+        const response = await fetch(updateAvatarUrl, {
+          method: 'PATCH',
+          body: formData
+          // ⚠️ Do NOT set Content-Type — let browser set it with boundary
+        });
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          // If response is not JSON (e.g., 500 HTML error page)
+          throw new Error('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || 'خطا در به‌روزرسانی آواتار.');
+        }
+
+        // Update profile image immediately
+        avatarModal.hide();
+        setTimeout(() => {
+          alert('آواتار با موفقیت به‌روزرسانی شد.');
+          location.reload();
+        }, 100);
+
+      } catch (error) {
+        console.error('Avatar upload error:', error);
+        errorDiv.textContent = error.message || 'خطای ناشناخته رخ داد.';
+        errorDiv.classList.remove('d-none');
+      } finally {
+        spinner.classList.add('d-none');
+        btnUpload.disabled = false;
+      }
+    });
+
+    // Reset modal on close
+    avatarModalElement.addEventListener('hidden.bs.modal', function() {
+      const form = document.getElementById('formUploadAvatar');
+      if (form) form.reset();
+      previewDiv.style.display = 'none';
+      previewImg.src = '';
+      errorDiv.classList.add('d-none');
+    });
+  });
+
+  //#endregion
+</script>

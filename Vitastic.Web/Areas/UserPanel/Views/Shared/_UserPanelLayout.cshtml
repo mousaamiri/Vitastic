@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+  <title>ویتاستیک | پنل کاربری</title>
+  <partial name="_MetaTags"/>
+
+  <partial name="_Styles"/>
+  @await RenderSectionAsync("AdditionalStyle", false)
+
+</head>
+
+<body class="index-page" dir="rtl">
+<!--*******************
+Preloader start
+********************-->
+<div id="preloader">
+  <div>
+    <img src="~/shared/panel/images/pre.gif" alt="">
+  </div>
+</div>
+<!--*******************
+Preloader end
+********************-->
+
+<!--**********************************
+Main wrapper start
+***********************************-->
+<div class="main-wrapper">
+  <partial name="_NavHeader"/>
+  <partial name="_ChatBox"/>
+  <partial name="_Header"/>
+  <partial name="_Sidebar"/>
+  <!--**********************************
+  Content body start
+  ***********************************-->
+    <div class="content-body">
+      <div class="container-fluid">
+        @RenderBody()
+      </div>
+      </div>
+  <!--**********************************
+  Content body end
+  ***********************************-->
+<partial name="_Footer"/>
+
+
+  <!--**********************************
+  Support ticket button start
+  ***********************************-->
+
+  <!--**********************************
+  Support ticket button end
+  ***********************************-->
+</div>
+<!--**********************************
+Main wrapper end
+***********************************-->
+
+<partial name="_Scripts"/>
+@await RenderSectionAsync("AdditionalScript", false)
+</body>
+
+</html>

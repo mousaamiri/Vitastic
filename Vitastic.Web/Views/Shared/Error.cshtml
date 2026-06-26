@@ -1,0 +1,51 @@
+@model Vitastic.Web.Models.ViewModels.ErrorViewModel
+@{
+    ViewData["CourseTitle"] = "خطا";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> خطا رخ داد</h3>
+                </div>
+
+                <div class="card-body">
+                    <p class="lead text-danger">
+                        در هنگام پردازش درخواست شما خطایی رخ داد.
+                    </p>
+
+                    @if (Model.ShowRequestId)
+                    {
+                        <div class="alert alert-warning">
+                            <strong>شناسه درخواست:</strong> <code>@Model.RequestId</code>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <h5>حالت توسعه</h5>
+                    <p>
+                        تغییر به محیط <strong>توسعه</strong> اطلاعات دقیق‌تری درباره خطای رخ‌داده نمایش خواهد داد.
+                    </p>
+                    <p>
+                        <strong>محیط توسعه نباید برای برنامه‌های مستقر شده فعال باشد.</strong>
+                        این کار می‌تواند منجر به نمایش اطلاعات حساس از خطاها به کاربران نهایی شود.
+                        برای اشکال‌زدایی محلی، محیط <strong>توسعه</strong> را با تنظیم متغیر محیطی
+                        <code>ASPNETCORE_ENVIRONMENT</code> به <strong>Development</strong> فعال کنید
+                        و برنامه را مجدداً راه‌اندازی کنید.
+                    </p>
+                </div>
+
+                <div class="card-footer text-muted text-end">
+                    <a href="javascript:history.back()" class="btn btn-outline-danger">
+                        بازگشت
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

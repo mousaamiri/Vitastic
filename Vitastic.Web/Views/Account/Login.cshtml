@@ -1,0 +1,256 @@
+@model Vitastic.Web.Models.ViewModels.LoginUserModel
+
+@{
+    ViewData["CourseTitle"] = "ورود به حساب کاربری";
+    Layout = "_Layout";
+}
+
+<!-- Page CourseTitle -->
+<div class="page-title light-background">
+    <div class="container ">
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a class="ajax-link" href="/">خانه</a></li>
+                <li class="current">ورود</li>
+            </ol>
+        </nav>
+        <h1 class="mt-2 mb-lg-0">ورود</h1>
+    </div>
+</div><!-- End Page CourseTitle -->
+<!-- Show Success Login Message and Redirect  -->
+<!-- Login Section -->
+<section id="login" class="enroll section mt-0 mb-5">
+    <div class="container" @* data-aos="fade-up" data-aos-delay="100" *@>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="enrollment-form-wrapper">
+                    @if (ViewBag.IsSuccess != null && ViewBag.IsSuccess == true)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                            <strong>موفقیت!</strong> ورود با موفقیت انجام شد.
+                            <span id="redirectCounter">3</span> ثانیه دیگر به صفحه اصلی منتقل می‌شوید...
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+                        </div>
+
+                        <h2>ورود موفق</h2>
+                        <p>تبریک! شما با موفقیت وارد حساب کاربری خود شدید. به زودی به صفحه اصلی هدایت خواهید شد.</p>
+
+                        <script>
+                            let counter = 3;
+                            const counterElement = document.getElementById("redirectCounter");
+
+                            const interval = setInterval(function () {
+                                counter--;
+                                if (counterElement) counterElement.textContent = counter;
+
+                              const loginUrl = '@Url.Action("Login", "Account")';
+
+                              if (counter <= 0) {
+                                clearInterval(interval);
+                                window.location.href = loginUrl;
+                              }
+                            }, 1000);
+                        </script>
+                    }
+
+                    <div class="enrollment-header text-center" @* data-aos="fade-up" data-aos-delay="200" *@>
+                        <h2>ورود به حساب کاربری</h2>
+                        <p>برای دسترسی به دوره‌ها و امکانات پلتفرم، وارد حساب کاربری خود شوید.</p>
+                    </div>
+
+                    <form id="login-form" class="enrollment-form was-validated" novalidate asp-action="Login" method="post" @* data-aos="fade-up" data-aos-delay="300" *@>
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div class="row mb-4">
+                            <div class="form-group mb-2 position-relative">
+                                <label for="email-input" class="form-label">ایمیل *</label>
+                                <input asp-for="Email" id="email-input" class="pe-5 pt-3 form-control" required/>
+
+                                <!-- ASP.NET Core Validation // For sever Validation -->
+                                <span asp-validation-for="Email" id="email-validation" class="d-none"></span>
+
+                                <!-- Tooltip Bootstrap -->
+                                <div class="invalid-tooltip"></div>
+                                <div class="valid-tooltip"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="form-group position-relative">
+                                    <label for="password" class="form-label">رمز عبور *</label>
+
+                                    <input type="password"
+                                           asp-for="Password"
+                                           id="password"
+                                           name="password"
+                                           class="form-control"
+                                           autocomplete="current-password"
+                                           required
+                                           minlength="7"
+                                           maxlength="20"
+                                           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&])[A-Za-z\d@@$!%*?&]{6,20}$"
+                                           placeholder="حداقل 6 کاراکتر شامل حروف، عدد و نماد">
+
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                                    <!-- Tooltip ها -->
+                                    <div class="invalid-tooltip">
+                                        ❌ رمز عبور باید بین 6 تا ۲۰ کاراکتر باشد، شامل:
+                                        | 🔡 یک حرف کوچک
+                                        | 🔠 یک حرف بزرگ
+                                        | 🔢 یک عدد
+                                        | 🔒 یک نماد (@@$!%*?&)
+                                    </div>
+                                    <div class="valid-tooltip">
+                                        ✅ رمز عبور قوی است!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row mb-4 mt-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <div class="form-check ">
+                                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">
+                                            مرا به خاطر بسپار
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button id="login-form-submit-button" type="submit" class="btn btn-enroll">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                    ورود
+                                </button>
+                                <p class="enrollment-note mt-3">
+                                    <i class="bi bi-shield-check"></i>
+                                    اطلاعات شما امن است و هرگز با اشخاص ثالث به اشتراک گذاشته نخواهد شد
+                                </p>
+                                <p class="mt-3">
+                                    حساب کاربری ندارید؟ @Html.ActionLink("ثبت‌نام کنید", "Register", "Account", null, new { @class = "text-primary ajax-link" })
+                                </p>
+                                <p class="mt-2">
+                                    رمز عبور خود را فراموش کرده‌اید؟ @Html.ActionLink("بازیابی رمز عبور", "ForgetPassword", "Account", null, new { @class = "text-primary ajax-link" })
+                                </p>
+
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Inactive User Section -->
+                    @if (ViewBag.InactiveUser != null && (bool)ViewBag.InactiveUser)
+                    {
+                        <div class="alert alert-warning text-center mt-3">
+                            <div>
+                                <input type="checkbox" id="confirmActivation" class="form-check-input">
+                                <label for="confirmActivation" class="form-check-label">
+                                    تایید می‌کنم که می‌خواهم لینک فعال‌سازی دریافت کنم
+                                </label>
+                            </div>
+
+                            <form id="resendActivationForm" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Email" value="@Model?.Email" />
+                                <button type="submit" class="btn btn-sm btn-primary ms-2" id="resendBtn" disabled>
+                                    ارسال مجدد لینک فعال‌سازی
+                                </button>
+                            </form>
+
+                            <div id="resendMessage" class="mt-2"></div>
+                        </div>
+
+                        <script>
+                            const checkbox = document.getElementById('confirmActivation');
+                            const resendBtn = document.getElementById('resendBtn');
+                            const form = document.getElementById('resendActivationForm');
+                            const messageDiv = document.getElementById('resendMessage');
+
+                            checkbox.addEventListener('change', () => {
+                                resendBtn.disabled = !checkbox.checked;
+                            });
+
+                            form.addEventListener('submit', async (e) => {
+                                e.preventDefault();
+                                resendBtn.disabled = true;
+
+                                const formData = new FormData(form);
+                                const token = formData.get('__RequestVerificationToken');
+
+                                try {
+                                    const response = await fetch('@Url.Action("ResendActivationLink", "Account")', {
+                                        method: 'POST',
+                                        headers: {
+                                            'RequestVerificationToken': token
+                                        },
+                                        body: formData
+                                    });
+
+                                    const data = await response.json();
+
+                                    if (data.success) {
+                                        let countdown = 10;
+                                        messageDiv.innerHTML = `${data.message} (${countdown})`;
+
+                                        const timer = setInterval(() => {
+                                            countdown--;
+                                            messageDiv.innerHTML = `${data.message} (${countdown})`;
+                                            if (countdown <= 0) {
+                                                clearInterval(timer);
+                                                messageDiv.innerHTML = data.message;
+                                                resendBtn.disabled = false;
+                                            }
+                                        }, 1000);
+                                    } else {
+                                        messageDiv.innerHTML = `<span class="text-danger">${data.message}</span>`;
+                                        resendBtn.disabled = false;
+                                    }
+                                } catch (err) {
+                                    messageDiv.innerHTML = `<span class="text-danger">خطا در ارسال درخواست.</span>`;
+                                    resendBtn.disabled = false;
+                                }
+                            });
+                        </script>
+                    }
+
+                    <!-- Show info message if link sent -->
+                    @if (ViewBag.LinkSent != null && (bool)ViewBag.LinkSent)
+                    {
+                        <div class="alert alert-info text-center mt-3">
+                            لینک فعال‌سازی جدید برای شما ارسال شد. لطفاً ایمیل خود را بررسی کنید.
+                        </div>
+                    }
+                </div>
+            </div><!-- End Form Column -->
+        </div>
+    </div>
+</section><!-- /Login Section -->
+<script src="~/public/js/custom/email-validation.js"></script>
+<script>
+	"use strict";
+	const regForm = document.getElementById('login-form');
+	const registerFormSubmitButton = document.getElementById('login-form-submit-button');
+	registerFormSubmitButton.disabled = true;
+	regForm.addEventListener("input", () => {
+		if (regForm.checkValidity()) {
+			registerFormSubmitButton.disabled = false;
+		} else {
+			registerFormSubmitButton.disabled = true;
+		}
+	});
+
+	regForm.addEventListener("submit", (e) => {
+		if (!regForm.checkValidity()) {
+			e.preventDefault();
+		}
+	});
+</script>

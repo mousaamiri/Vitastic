@@ -1,0 +1,741 @@
+@* Views/Checkout/Index.cshtml *@
+@model Vitastic.Web.Models.ViewModels.CheckoutViewModel
+@{
+  ViewData["CourseTitle"] = "تکمیل خرید";
+  Layout = "_Layout";
+}
+
+@* ══════════════════════════════════════════════════════ *@
+@*                    STYLES                             *@
+@* ══════════════════════════════════════════════════════ *@
+
+@section AdditionalStyle {
+  <style>
+    /* #region Checkout Card */
+    .checkout-card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      transition: box-shadow .2s;
+    }
+
+      .checkout-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,.1);
+      }
+    /* #endregion */
+
+    /* #region Step Indicator */
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem 1rem;
+      font-size: .875rem;
+      color: #6c757d;
+      position: relative;
+    }
+
+      .step-item.active {
+        color: var(--bs-primary);
+        font-weight: 600;
+      }
+
+      .step-item.completed {
+        color: var(--bs-success);
+      }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+      border: 2px solid #dee2e6;
+      background: #fff;
+    }
+
+    .step-item.active .step-number {
+      border-color: var(--bs-primary);
+      background: var(--bs-primary);
+      color: #fff;
+    }
+
+    .step-item.completed .step-number {
+      border-color: var(--bs-success);
+      background: var(--bs-success);
+      color: #fff;
+    }
+
+    .step-connector {
+      width: 40px;
+      height: 2px;
+      background: #dee2e6;
+      align-self: center;
+    }
+
+    .step-item.completed + .step-connector {
+      background: var(--bs-success);
+    }
+    /* #endregion */
+
+    /* #region Course Item */
+    .course-item {
+      display: flex;
+      gap: 1rem;
+      padding: .75rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+      .course-item:last-child {
+        border-bottom: none;
+      }
+
+    .course-thumb {
+      width: 80px;
+      height: 56px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    /* #endregion */
+
+    /* #region Payment Method */
+    .payment-option {
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+      .payment-option:hover {
+        border-color: #adb5bd;
+      }
+
+      .payment-option.selected {
+        border-color: var(--bs-primary);
+        background: rgba(var(--bs-primary-rgb), .04);
+      }
+
+      .payment-option input[type="radio"] {
+        display: none;
+      }
+    /* #endregion */
+
+    /* #region Summary Divider */
+    .summary-divider {
+      border: none;
+      border-top: 1px dashed #dee2e6;
+      margin: .75rem 0;
+    }
+    /* #endregion */
+
+    /* #region Loading Overlay */
+    .checkout-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,.7);
+      z-index: 10;
+      border-radius: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+    /* #endregion */
+
+    /* #region Validation */
+    .field-validation-error {
+      color: var(--bs-danger);
+      font-size: .8rem;
+      margin-top: .25rem;
+      display: block;
+    }
+
+    .input-validation-error {
+      border-color: var(--bs-danger) !important;
+    }
+    /* #endregion */
+  </style>
+}
+
+@* ══════════════════════════════════════════════════════ *@
+@*                    PAGE CONTENT                       *@
+@* ══════════════════════════════════════════════════════ *@
+
+<div class="container py-4" dir="rtl">
+
+  @* #region Step Indicator *@
+  <div class="step-indicator">
+    <div class="step-item completed">
+      <span class="step-number"><i class="bi bi-check"></i></span>
+      <span>سبد خرید</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item active">
+      <span class="step-number">۲</span>
+      <span>تکمیل خرید</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item">
+      <span class="step-number">۳</span>
+      <span>پرداخت</span>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item">
+      <span class="step-number">۴</span>
+      <span>تأیید سفارش</span>
+    </div>
+  </div>
+  @* #endregion *@
+
+  <form asp-action="Submit" method="post" id="checkoutForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="OrderId" value="@Model.Order.Id" />
+    <input type="hidden" name="FinalAmount" value="@Model.Order.FinalAmount" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    <div class="row g-4">
+
+      @* ══════════════════════════════════════════ *@
+      @*          LEFT COLUMN (Main Content)       *@
+      @* ══════════════════════════════════════════ *@
+      <div class="col-lg-8">
+
+        @* #region Buyer Info Card *@
+        <div class="checkout-card card mb-4">
+          <div class="card-body">
+            <h6 class="mb-3">
+              <i class="bi bi-person-circle text-primary me-2"></i>
+              اطلاعات خریدار
+            </h6>
+            <div class="row g-3">
+              @if (!string.IsNullOrEmpty(Model.Order.UserFullName.Trim()))
+              {
+                @* FullName (read-only) *@
+                <div class="col-md-12">
+                  <label class="form-label text-muted small">
+                    <i class="bi course-thumb me-1"></i>
+                    نام و نام خانوادگی کاربر
+                  </label>
+                  <div class="form-control bg-light" dir="ltr" style="text-align: right">
+                    @Model.Order.UserFullName
+                  </div>
+                </div>
+
+                @* Hidden inputs so values are submitted *@
+                <input type="hidden" name="FirstName" value="@Model.Order.FirstName" />
+                <input type="hidden" name="LastName"  value="@Model.Order.LastName" />
+              }
+              else
+              {
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  این نام و نام خانوادگی به عنوان اطلاعات کاربری شما ثبت میشود
+                </small>
+                @* $1$ First Name #1# *@
+                 <div class="col-md-4"> 
+                   <label for="FirstName" class="form-label text-muted small"> 
+                     نام <span class="text-danger">*</span> 
+                   </label> 
+                   <input type="text" 
+                          id="FirstName" 
+                          name="FirstName" 
+                          class="form-control" 
+                          value="@Model.Order.FirstName" 
+                          maxlength="50" 
+                          required 
+                          placeholder="نام خود را وارد کنید" /> 
+                   <span asp-validation-for="Order.FirstName"
+                         class="field-validation-error"></span> 
+                 </div> 
+                 
+                 @* $1$ Last Name #1#  *@
+                 <div class="col-md-4"> 
+                   <label for="LastName" class="form-label text-muted small"> 
+                     نام خانوادگی <span class="text-danger">*</span> 
+                   </label> 
+                   <input type="text" 
+                          id="LastName" 
+                          name="LastName" 
+                          class="form-control" 
+                          value="@Model.Order.LastName" 
+                          maxlength="50" 
+                          required 
+                          placeholder="نام خانوادگی خود را وارد کنید" /> 
+                   <span asp-validation-for="Order.LastName" 
+                         class="field-validation-error"></span>
+                 </div> 
+              }
+              @if (string.IsNullOrEmpty(Model.Order?.PhoneNumber?.Trim()))
+              {
+                
+                @* Phone Number *@
+                <div class="col-md-6">
+                  <label for="PhoneNumber" class="form-label text-muted small">
+                    شماره تماس <span class="text-danger">*</span>
+                  </label>
+                  <input type="tel"
+                         id="PhoneNumber"
+                         name="PhoneNumber"
+                         class="form-control"
+                         dir="ltr"
+                         style="text-align: right"
+                         value="@Model.Order?.PhoneNumber"
+                         maxlength="15"
+                         required
+                         placeholder="۰۹۱۲۳۴۵۶۷۸۹" />
+                  <span asp-validation-for="Order.PhoneNumber"
+                        class="field-validation-error"></span>
+                  <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    اطلاع رسانی ها به این شماره تلفن ارسال میشود
+                  </small>
+                </div>
+                <input type="hidden" name="PhoneNumber" value="@Model.Order?.PhoneNumber" />
+              }
+
+              @* Email (read-only) *@
+              <div class="col-md-6">
+                <label class="form-label text-muted small">
+                  <i class="bi bi-envelope me-1"></i>
+                  ایمیل
+                </label>
+                <div class="form-control bg-light" dir="ltr" style="text-align: right">
+                  @Model.Order.UserEmail
+                </div>
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  دسترسی دوره‌ها به این ایمیل ارسال می‌شود
+                </small>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        @* #endregion *@
+
+        @* #region Order Items Card *@
+        <div class="checkout-card card mb-4">
+          <div class="card-body">
+            <h6 class="mb-3">
+              <i class="bi bi-mortarboard text-primary me-2"></i>
+              دوره‌های انتخابی
+              <span class="badge bg-primary bg-opacity-10 text-primary me-2">
+                @Model.Order.Items.Count دوره
+              </span>
+            </h6>
+
+            @foreach (var item in Model.Order.Items)
+            {
+              <div class="course-item">
+                <img src="@item.ThumbnailUrl"
+                     alt="@item.CourseTitle"
+                     class="course-thumb"
+                     onerror="this.src='/images/placeholder-course.png'" />
+                <div class="flex-grow-1">
+                  <div class="fw-semibold small">@item.CourseTitle</div>
+                  <div class="text-muted" style="font-size:.8rem">
+                    <i class="bi bi-person me-1"></i>@item.InstructorFullName
+                  </div>
+                </div>
+                <div class="text-start" style="min-width:100px">
+                  @if (item.HasDiscount)
+                  {
+                    <div class="text-decoration-line-through text-muted small">
+                      @item.UnitPrice.ToString("N0") تومان
+                    </div>
+                    <div class="fw-bold text-success small">
+                      @item.DiscountAmount.ToString("N0") تومان
+                    </div>
+                  }
+                  else
+                  {
+                    <div class="fw-bold small">
+                      @item.UnitPrice.ToString("N0") تومان
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+        @* #endregion *@
+
+        @* #region Payment Method Card *@
+        <div class="checkout-card card mb-4">
+          <div class="card-body">
+            <h6 class="mb-3">
+              <i class="bi bi-credit-card text-primary me-2"></i>
+              روش پرداخت
+            </h6>
+
+            <div class="row g-3">
+              @foreach (var method in Model.PaymentMethods)
+              {
+                <div class="col-md-4">
+                  <label class="payment-option d-block @(method.IsDefault ? "selected" : "")"
+                         data-method-id="@method.Id"
+                         tabindex="0"
+                         role="radio"
+                         aria-checked="@(method.IsDefault ? "true" : "false")"
+                         aria-label="@method.Name">
+                    <input type="radio"
+                           name="PaymentMethodId"
+                           value="@method.Id"
+                           @(method.IsDefault ? "checked" : "") />
+                    <div class="text-center">
+                      <i class="bi @method.Icon fs-4 d-block mb-2 text-primary"></i>
+                      <div class="fw-semibold small">@method.Name</div>
+                      <div class="text-muted" style="font-size:.75rem">
+                        @method.Description
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        @* #endregion *@
+
+        @* #region Customer Note Card *@
+        <div class="checkout-card card mb-4">
+          <div class="card-body">
+            <h6 class="mb-3">
+              <i class="bi bi-chat-left-text text-primary me-2"></i>
+              یادداشت
+              <span class="text-muted small fw-normal">(اختیاری)</span>
+            </h6>
+            <textarea name="CustomerNote"
+                      id="CustomerNote"
+                      class="form-control"
+                      rows="3"
+                      maxlength="500"
+                      placeholder="اگر توضیح خاصی دارید اینجا بنویسید...">@Model.Order.CustomerNote</textarea>
+            <div class="text-muted small mt-1 text-start">
+              <span id="noteCharCount">0</span>/500
+            </div>
+          </div>
+        </div>
+        @* #endregion *@
+
+      </div>
+
+      @* ══════════════════════════════════════════ *@
+      @*         RIGHT COLUMN (Summary Sidebar)    *@
+      @* ══════════════════════════════════════════ *@
+      <div class="col-lg-4">
+        <div class="checkout-card card position-sticky" style="top:1rem">
+
+          @* Loading overlay *@
+          <div id="summaryOverlay" class="checkout-overlay d-none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+
+            @* #region Summary Header *@
+            <h6 class="mb-3">
+              <i class="bi bi-receipt text-primary me-2"></i>
+              خلاصه سفارش
+            </h6>
+            @* #endregion *@
+
+            @* #region Summary Rows *@
+            <div class="d-flex justify-content-between mb-2 small">
+              <span class="text-muted">جمع دوره‌ها (@Model.Order.Items.Count مورد)</span>
+              <span>@Model.Order.ItemsTotal.ToString("N0") تومان</span>
+            </div>
+
+            @if (Model.Order.DiscountAmount > 0)
+            {
+              <div class="d-flex justify-content-between mb-2 small text-success">
+                <span>
+                  <i class="bi bi-tag me-1"></i>
+                  تخفیف
+                  @if (!string.IsNullOrWhiteSpace(Model.Order.DiscountCode))
+                  {
+                    <span class="badge bg-success bg-opacity-10 text-success me-1">
+                      @Model.Order.DiscountCode
+                    </span>
+                  }
+                </span>
+                <span>- @Model.Order.DiscountAmount.ToString("N0") تومان</span>
+              </div>
+            }
+
+            @if (Model.Order.TaxAmount > 0)
+            {
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">مالیات</span>
+                <span>+ @Model.Order.TaxAmount.ToString("N0") تومان</span>
+              </div>
+            }
+
+           @*  @if (Model.Summary.VatAmount > 0)
+            {
+              <div class="d-flex justify-content-between mb-2 small">
+                <span class="text-muted">ارزش افزوده</span>
+                <span>+ @Model.Order.Summary.VatAmount.ToString("N0") تومان</span>
+              </div>
+            } *@
+
+            <hr class="summary-divider" />
+
+            <div class="d-flex justify-content-between mb-3">
+              <span class="fw-bold">مبلغ قابل پرداخت</span>
+              <span class="fw-bold text-primary fs-5">
+                @Model.Order.FinalAmount.ToString("N0")
+                <small>تومان</small>
+              </span>
+            </div>
+            @* #endregion *@
+
+            @* #region Secure Payment Notice *@
+            <div class="bg-light rounded-3 p-2 mb-3 text-center small">
+              <i class="bi bi-shield-lock text-success me-1"></i>
+              پرداخت امن با رمزنگاری SSL
+            </div>
+            @* #endregion *@
+
+            @* #region Submit Button *@
+            <button type="submit"
+                    id="submitPaymentBtn"
+                    class="btn btn-primary w-100 py-3 rounded-3 fw-bold">
+              <span id="submitBtnText">
+                <i class="bi bi-lock me-2"></i>
+                پرداخت @Model.Order.FinalAmount.ToString("N0") تومان
+              </span>
+              <span id="submitBtnSpinner" class="d-none">
+                <span class="spinner-border spinner-border-sm me-2"
+                      role="status" aria-hidden="true"></span>
+                در حال انتقال به درگاه...
+              </span>
+            </button>
+            @* #endregion *@
+
+            @* #region Terms Notice *@
+            <p class="text-muted text-center mt-3" style="font-size:.75rem">
+              با کلیک روی دکمه پرداخت،
+              <a href="/terms" class="text-decoration-none">شرایط و قوانین</a>
+              سایت را می‌پذیرید.
+            </p>
+            @* #endregion *@
+
+            @* #region Back to Cart *@
+            <div class="text-center mt-2">
+              <a asp-controller="Cart" asp-action="Index"
+                 class="text-muted small text-decoration-none">
+                <i class="bi bi-arrow-right me-1"></i>
+                بازگشت به سبد خرید
+              </a>
+            </div>
+            @* #endregion *@
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+@* ══════════════════════════════════════════════════════ *@
+@*                    SCRIPTS                            *@
+@* ══════════════════════════════════════════════════════ *@
+
+@section AdditionalScript {
+  <script>
+
+    // #region Payment Method Selection
+
+    document.querySelectorAll('.payment-option').forEach(option => {
+      option.addEventListener('click', () => {
+        // Deselect all
+        document.querySelectorAll('.payment-option').forEach(o => {
+          o.classList.remove('selected');
+          o.setAttribute('aria-checked', 'false');
+        });
+
+        // Select clicked
+        option.classList.add('selected');
+        option.setAttribute('aria-checked', 'true');
+        option.querySelector('input[type="radio"]').checked = true;
+      });
+
+      // Keyboard support
+      option.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          option.click();
+        }
+      });
+    });
+
+    // #endregion
+
+    // #region Character Counter for Note
+
+    const noteTextarea = document.getElementById('CustomerNote');
+    const charCount = document.getElementById('noteCharCount');
+
+    if (noteTextarea && charCount) {
+      charCount.textContent = noteTextarea.value.length;
+
+      noteTextarea.addEventListener('input', () => {
+        charCount.textContent = noteTextarea.value.length;
+      });
+    }
+
+    // #endregion
+
+    // #region Client-Side Validation
+
+    function validateForm() {
+      let isValid = true;
+
+      // Clear previous errors
+      document.querySelectorAll('.checkout-field-error').forEach(el => el.remove());
+      document.querySelectorAll('.input-validation-error').forEach(el =>
+        el.classList.remove('input-validation-error'));
+
+      // Validate FirstName (only if visible input exists)
+      const firstName = document.getElementById('FirstName');
+      if (firstName && !firstName.value.trim()) {
+        showFieldError(firstName, 'لطفاً نام خود را وارد کنید');
+        isValid = false;
+      }
+
+      // Validate LastName (only if visible input exists)
+      const lastName = document.getElementById('LastName');
+      if (lastName && !lastName.value.trim()) {
+        showFieldError(lastName, 'لطفاً نام خانوادگی خود را وارد کنید');
+        isValid = false;
+      }
+
+      // Validate PhoneNumber (only if visible input exists)
+      const phone = document.getElementById('PhoneNumber');
+      if (phone) {
+        const phoneVal = phone.value.trim();
+        if (!phoneVal) {
+          showFieldError(phone, 'لطفاً شماره تماس خود را وارد کنید');
+          isValid = false;
+        } else if (!/^09\d{9}$/.test(phoneVal) && !/^\+989\d{9}$/.test(phoneVal)) {
+          showFieldError(phone, 'شماره تماس معتبر نیست (مثال: ۰۹۱۲۳۴۵۶۷۸۹)');
+          isValid = false;
+        }
+      }
+
+      // Validate PaymentMethod
+      const selectedMethod = document.querySelector('input[name="PaymentMethodId"]:checked');
+      if (!selectedMethod) {
+        showToast('لطفاً روش پرداخت را انتخاب کنید', 'warning');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function showFieldError(input, message) {
+      input.classList.add('input-validation-error');
+      const errorSpan = document.createElement('span');
+      errorSpan.className = 'field-validation-error checkout-field-error';
+      errorSpan.textContent = message;
+      input.parentNode.appendChild(errorSpan);
+    }
+
+    // #endregion
+
+    // #region Form Submission (validate + prevent double-click)
+
+    const checkoutForm = document.getElementById('checkoutForm');
+    const submitBtn = document.getElementById('submitPaymentBtn');
+    const submitText = document.getElementById('submitBtnText');
+    const submitSpinner = document.getElementById('submitBtnSpinner');
+
+    let isSubmitting = false;
+
+    checkoutForm?.addEventListener('submit', (e) => {
+      // Client-side validation
+      if (!validateForm()) {
+        e.preventDefault();
+        return;
+      }
+
+      // Prevent double submission
+      if (isSubmitting) {
+        e.preventDefault();
+        return;
+      }
+
+      isSubmitting = true;
+
+      // Show loading state
+      if (submitBtn && submitText && submitSpinner) {
+        submitBtn.disabled = true;
+        submitText.classList.add('d-none');
+        submitSpinner.classList.remove('d-none');
+      }
+
+      // Safety timeout: re-enable after 30s
+      setTimeout(() => {
+        isSubmitting = false;
+        if (submitBtn && submitText && submitSpinner) {
+          submitBtn.disabled = false;
+          submitText.classList.remove('d-none');
+          submitSpinner.classList.add('d-none');
+        }
+      }, 30000);
+    });
+
+    // #endregion
+
+    // #region Clear Validation on Input
+
+    document.querySelectorAll('#FirstName, #LastName, #PhoneNumber').forEach(input => {
+      input.addEventListener('input', () => {
+        input.classList.remove('input-validation-error');
+        const error = input.parentNode.querySelector('.checkout-field-error');
+        if (error) error.remove();
+      });
+    });
+
+    // #endregion
+
+    // #region Toast Notification Helper
+
+    function showToast(message, type = 'info') {
+      if (typeof CartManager !== 'undefined' && CartManager.showNotification) {
+        CartManager.showNotification(message, type);
+        return;
+      }
+
+      const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+
+      const toast = document.createElement('div');
+      toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed shadow-sm`;
+      toast.style.cssText = 'top:1rem;left:50%;transform:translateX(-50%);z-index:9999;min-width:300px;text-align:center;';
+      toast.innerHTML = `${icons[type] || ''} ${message}`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.transition = 'opacity .3s';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // #endregion
+
+  </script>
+}

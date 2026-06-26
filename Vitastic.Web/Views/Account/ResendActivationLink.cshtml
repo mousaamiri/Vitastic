@@ -1,0 +1,107 @@
+﻿@model Vitastic.Web.Models.ViewModels.ResendActivationUserModel
+
+@{
+    ViewData["CourseTitle"] = "ارسال مجدد لینک فعالسازی";
+    Layout = "";
+}
+
+<!-- Page CourseTitle -->
+<div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">ارسال مجدد لینک فعالسازی</h1>
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a class="ajax-link" href="/">خانه</a></li>
+                <li class="current">ارسال مجدد لینک فعالسازی</li>
+            </ol>
+        </nav>
+    </div>
+</div><!-- End Page CourseTitle -->
+
+<!-- Resend Activation Section -->
+<section id="resend-activation" class="enroll section mt-0 mb-5">
+    <div class="container" @* data-aos="fade-up" data-aos-delay="100" *@>
+        @if (ViewBag.IsSuccess != null && ViewBag.IsSuccess == true)
+        {
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                <strong>موفقیت!</strong> لینک فعالسازی جدید به ایمیل شما ارسال شد. لطفاً ایمیل خود را بررسی کنید.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+            </div>
+        }
+        else if (ViewBag.IsSuccess != null && ViewBag.IsSuccess == false)
+        {
+            <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                <strong>خطا!</strong> مشکلی در ارسال لینک فعالسازی رخ داد. لطفاً دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+            </div>
+        }
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="enrollment-form-wrapper">
+                    <div class="enrollment-header text-center" @* data-aos="fade-up" data-aos-delay="200" *@>
+                        <h2>ارسال مجدد لینک فعالسازی</h2>
+                        <p>آدرس ایمیل خود را وارد کنید تا لینک فعالسازی جدیدی برای شما ارسال شود.</p>
+                    </div>
+
+                    <form id="resend-activation-form" class="enrollment-form was-validated" novalidate asp-action="ResendActivationLink" method="post" @* data-aos="fade-up" data-aos-delay="300" *@>
+                        @Html.AntiForgeryToken()
+	                    <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="row mb-4">
+                            <div class="form-group mb-2 position-relative">
+                                <label for="email-input" class="form-label">ایمیل *</label>
+                                <input asp-for="Email" id="email-input" class="pe-5 pt-2 form-control" required/>
+
+                                <!-- ASP.NET Core Validation //For server validation -->
+                                <span asp-validation-for="Email" id="email-validation" class="d-none"></span>
+
+                                <!-- Tooltip Bootstrap -->
+                                <div class="invalid-tooltip"></div>
+                                <div class="valid-tooltip"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button type="submit" id="resend-activation-submit-button" class="btn btn-enroll">
+                                    <i class="bi bi-envelope me-2"></i>
+                                    ارسال لینک فعالسازی
+                                </button>
+                                <p class="enrollment-note mt-3">
+                                    <i class="bi bi-shield-check"></i>
+                                    اطلاعات شما امن است و هرگز با اشخاص ثالث به اشتراک گذاشته نخواهد شد
+                                </p>
+                                <p class="mt-3">
+                                    حساب کاربری ندارید؟ <a href="/Register" class="text-primary ajax-link">ثبت‌نام کنید</a>
+                                </p>
+                                <p class="mt-2">
+                                    حساب خود را فعال کرده‌اید؟ <a href="/Login" class="text-primary ajax-link">وارد شوید</a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- End Form Column -->
+        </div>
+    </div>
+</section><!-- /Resend Activation Section -->
+<script src="~/public/js/custom/email-validation.js"></script>
+<script>
+	"use strict";
+	const regForm = document.getElementById('resend-activation-form');
+	const registerFormSubmitButton = document.getElementById('resend-activation-submit-button');
+	registerFormSubmitButton.disabled = true;
+	regForm.addEventListener("input", () => {
+		if (regForm.checkValidity()) {
+			registerFormSubmitButton.disabled = false;
+		} else {
+			registerFormSubmitButton.disabled = true;
+		}
+	});
+
+	regForm.addEventListener("submit", (e) => {
+		if (!regForm.checkValidity()) {
+			e.preventDefault();
+		}
+	});
+</script>

@@ -1,0 +1,382 @@
+@using Vitastic.Web.Areas.Admin.Models.Course
+@using Vitastic.Web.Helper
+@model Vitastic.Web.Areas.Admin.Models.Course.CourseDetailUiModel
+@{
+	var level = ((CourseUiLevel)Model.Level).LevelTranslator();
+
+	var sectoins = Model.Sections.Count;
+	var episodes = Model.Sections.Sum(section => section.Episodes.Count());
+	var courseTime = Model.Sections.Aggregate(TimeSpan.Zero, (current1, section) => section.Episodes.Aggregate(current1, (current, ep) => current + ep.Duration));
+
+}
+<main class="main">
+
+	<!-- عنوان صفحه -->
+	<div class="page-title light-background">
+		<div class="container d-lg-flex justify-content-between align-items-center">
+			<h1 class="mb-2 mb-lg-0">جزئیات دوره</h1>
+			<nav class="breadcrumbs">
+				<ol>
+					<li><a asp-controller="Shop" asp-action="Index">لیست دوره ها</a></li>
+					<li class="current">جزئیات دوره @Model.Title</li>
+				</ol>
+			</nav>
+		</div>
+	</div><!-- پایان عنوان صفحه -->
+	<!-- بخش جزئیات دوره -->
+	<section id="course-details" class="course-details section">
+
+		<div class="container" data-aos="fade-up" data-aos-delay="100">
+
+			<div class="row">
+				<div class="col-lg-8">
+
+					<!-- هدر اصلی دوره -->
+					<div class="course-hero" data-aos="fade-up" data-aos-delay="200">
+						<div class="hero-content">
+							<div class="course-badge">
+								@foreach (var category in Model.Categories)
+								{
+									<span class="badge bg-primary me-1">@category.Name</span>
+								}
+								<span class="level">@level</span>
+							</div>
+							<h1>@Model.Title</h1>
+							<p class="course-subtitle">@Model.ShortDescription</p>
+
+							<div class="instructor-card">
+								<img src="assets/img/person/@Model.InstructorAvatar" alt="مدرس" class="instructor-image">
+								<div class="instructor-details">
+									<h5>@Model.InstructorFullName</h5>
+									<span>توسعه‌دهنده ارشد فول‌استک</span>
+									<div class="instructor-rating">
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-fill"></i>
+										<i class="bi bi-star-half"></i>
+										<span>۴.۸ (۱,۲۴۷ نظر)</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="hero-image">
+							<img src="https://localhost:44314//img/education/courses/@Model.ImageName" alt="پیش‌نمایش دوره" class="img-fluid">
+							<div class="play-overlay">
+								<button class="play-btn">
+									<i class="bi bi-play-fill"></i>
+								</button>
+								<span>مشاهده پیش‌نمایش</span>
+							</div>
+						</div>
+					</div><!-- پایان هدر اصلی دوره -->
+					<!-- تب‌های ناوبری دوره -->
+					<div class="course-nav-tabs" data-aos="fade-up" data-aos-delay="300">
+						<ul class="nav nav-tabs" id="course-detailsCourseTab" role="tablist">
+							<li class="nav-item">
+								<button class="nav-link active" id="course-detailsoverview-tab" data-bs-toggle="tab"
+										data-bs-target="#course-detailsoverview" type="button" role="tab">
+									<i class="bi bi-layout-text-window-reverse"></i>
+									مرور کلی
+								</button>
+							</li>
+							<li class="nav-item">
+								<button class="nav-link" id="course-detailscurriculum-tab" data-bs-toggle="tab"
+										data-bs-target="#course-detailscurriculum" type="button" role="tab">
+									<i class="bi bi-list-ul"></i>
+									سرفصل‌ها
+								</button>
+							</li>
+							<li class="nav-item">
+								<button class="nav-link" id="course-detailsreviews-tab" data-bs-toggle="tab"
+										data-bs-target="#course-detailsreviews" type="button" role="tab">
+									<i class="bi bi-star"></i>
+									نظرات
+								</button>
+							</li>
+						</ul>
+
+						<div class="tab-content" id="course-detailsCourseTabContent">
+
+							<!-- تب مرور کلی -->
+							<div class="tab-pane fade show active" id="course-detailsoverview" role="tabpanel">
+
+								<div class="overview-section">
+									<h3>توضیحات دوره</h3>
+									@Model.Description
+								</div>
+
+								<div class="skills-grid">
+									<h3>مهارت‌هایی که کسب خواهید کرد</h3>
+									<div class="row">
+										<div class="col-md-6">
+											<div class="skill-item">
+												<div class="skill-icon">
+													<i class="bi bi-code-slash"></i>
+												</div>
+												<div class="skill-content">
+													<h5>توسعه فرانت‌اند</h5>
+													<p>React، جاوااسکریپت ES6+، HTML5 و CSS3</p>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="skill-item">
+												<div class="skill-icon">
+													<i class="bi bi-server"></i>
+												</div>
+												<div class="skill-content">
+													<h5>توسعه بک‌اند</h5>
+													<p>Node.js، Express.js، ساخت APIهای RESTful</p>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="skill-item">
+												<div class="skill-icon">
+													<i class="bi bi-database"></i>
+												</div>
+												<div class="skill-content">
+													<h5>مدیریت پایگاه داده</h5>
+													<p>MongoDB، Mongoose، مدل‌سازی داده</p>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="skill-item">
+												<div class="skill-icon">
+													<i class="bi bi-shield-check"></i>
+												</div>
+												<div class="skill-content">
+													<h5>امنیت و تست</h5>
+													<p>احراز هویت، JWT، تست واحد</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="requirements-section">
+									<h3>پیش‌نیازها</h3>
+									<ul class="requirements-list">
+										<li><i class="bi bi-check2"></i>آشنایی ابتدایی با HTML و CSS</li>
+										<li><i class="bi bi-check2"></i>دانش پایه‌ای جاوااسکریپت</li>
+										<li><i class="bi bi-check2"></i>کامپیوتر با اتصال اینترنت</li>
+										<li><i class="bi bi-check2"></i>نصب ویرایشگر متن یا IDE</li>
+									</ul>
+								</div>
+
+							</div><!-- پایان تب مرور کلی -->
+							<!-- تب سرفصل‌ها -->
+							<div class="tab-pane fade" id="course-detailscurriculum" role="tabpanel">
+
+								<div class="curriculum-overview">
+									<div class="curriculum-stats">
+										<div class="stat">
+											<i class="bi bi-collection-play"></i>
+											<span>@sectoins بخش</span>
+										</div>
+										<div class="stat">
+											<i class="bi bi-play-circle"></i>
+											<span>@episodes درس</span>
+										</div>
+										<div class="stat">
+											<i class="bi bi-clock"></i>
+											<span>@(courseTime)</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="accordion" id="curriculumAccordion">
+
+									@foreach (var section in Model.Sections)
+									{
+										var sectionTime = section.Episodes.Aggregate(TimeSpan.Zero, (current, episode) => current + episode.Duration);
+										var lessons = Model.Sections.Sum(ep => ep.Episodes.Count);
+										<div class="accordion-item curriculum-module">
+											<h2 class="accordion-header">
+												<button class="accordion-button" type="button" data-bs-toggle="collapse"
+														data-bs-target="#module1">
+													<div class="module-info">
+														<span class="module-title">@(section.Title)</span>
+														<span class="module-meta">@lessons درس • به مدت @sectionTime </span>
+													</div>
+												</button>
+											</h2>
+											<div id="module1" class="accordion-collapse collapse show" data-bs-parent="#curriculumAccordion">
+												<div class="accordion-body">
+													<div class="lessons-list">
+														@foreach (var episode in section.Episodes)
+														{
+															<div class="lesson">
+																<i class="bi bi-play-circle"></i>
+																<span class="lesson-title">@episode.Title </span>
+																<span class="lesson-time">به مدت @episode.Duration</span>
+															</div>
+														}
+
+													</div>
+												</div>
+											</div>
+										</div>
+									}
+
+									<!-- بقیه ماژول‌ها هم به همین شکل می‌توانند ترجمه شوند... -->
+
+								</div>
+
+							</div><!-- پایان تب سرفصل‌ها -->
+							<!-- تب نظرات -->
+							<div class="tab-pane fade" id="course-detailsreviews" role="tabpanel">
+
+								<div class="reviews-summary">
+									<div class="rating-overview">
+										<div class="overall-rating">
+											<div class="rating-number">۴.۸</div>
+											<div class="rating-stars">
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-fill"></i>
+												<i class="bi bi-star-half"></i>
+											</div>
+											<div class="rating-text">۱,۲۴۷ نظر</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="reviews-list">
+									<div class="review-item">
+										<div class="reviewer-info">
+											<img src="assets/img/person/person-f-12.webp" alt="نظر دهنده" class="reviewer-avatar">
+											<div class="reviewer-details">
+												<h6>جسیکا چن</h6>
+												<div class="review-rating">
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+												</div>
+											</div>
+											<span class="review-date">۲ هفته پیش</span>
+										</div>
+										<p class="review-text">مدرس مفاهیم پیچیده را بسیار واضح توضیح می‌دهد. بسیار راضی هستم!</p>
+									</div>
+
+									<div class="review-item">
+										<div class="reviewer-info">
+											<img src="assets/img/person/person-m-5.webp" alt="نظر دهنده" class="reviewer-avatar">
+											<div class="reviewer-details">
+												<h6>دیوید تامپسون</h6>
+												<div class="review-rating">
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star-fill"></i>
+													<i class="bi bi-star"></i>
+												</div>
+											</div>
+											<span class="review-date">۱ ماه پیش</span>
+										</div>
+										<p class="review-text">
+											مثال‌های عملی و پروژه‌های واقعی بسیار کمک‌کننده بودند. درک مفاهیم خیلی بهتر
+											شد.
+										</p>
+									</div>
+
+								</div>
+
+							</div><!-- پایان تب نظرات -->
+
+						</div>
+					</div><!-- پایان تب‌های ناوبری -->
+
+				</div>
+
+				<div class="col-lg-4">
+
+					<!-- کارت ثبت‌نام -->
+					<div class="enrollment-card" data-aos="fade-up" data-aos-delay="200">
+
+						<div class="card-header">
+							<div class="price-display">
+								<span class="current-price">@Model.Price  تومان</span>
+								@* <span class="original-price">۱۱,۵۰۰,۰۰۰ تومان</span> *@
+								@* <span class="discount">۴۰٪ تخفیف</span> *@
+							</div>
+							<div class="enrollment-count">
+								<i class="bi bi-people"></i>
+								<span>۳,۸۹۲ نفر ثبت‌نام کرده‌اند</span>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="course-highlights">
+								<div class="highlight-item">
+									<i class="bi bi-trophy"></i>
+									<span>گواهی پایان دوره</span>
+								</div>
+								<div class="highlight-item">
+									<i class="bi bi-clock-history"></i>
+									<span>@courseTime    محتوا</span>
+								</div>
+								<div class="highlight-item">
+									<i class="bi bi-download"></i>
+									<span>منابع قابل دانلود</span>
+								</div>
+								<div class="highlight-item">
+									<i class="bi bi-infinity"></i>
+									<span>دسترسی مادام‌العمر</span>
+								</div>
+								<div class="highlight-item">
+									<i class="bi bi-phone"></i>
+									<span>دسترسی از موبایل</span>
+								</div>
+							</div>
+
+							<div class="action-buttons ">
+								<a asp-controller="Shop" asp-action="Buy"
+										asp-route-courseId="@Model.CourseId"
+									   class="btn btn-primary">
+									افزودن به سبد خرید
+								</a>
+							</div>
+
+							<div class="guarantee">
+								<i class="bi bi-shield-check"></i>
+								<span>گارانتی بازگشت وجه ۳۰ روزه</span>
+							</div>
+						</div>
+
+					</div><!-- پایان کارت ثبت‌نام -->
+					<!-- جزئیات دوره (کنار) -->
+					<div class="course-details-card" data-aos="fade-up" data-aos-delay="300">
+						<h4>مشخصات دوره</h4>
+
+						<div class="detail-grid">
+							<div class="detail-row">
+								<span class="detail-label">مدت دوره</span>
+								<span class="detail-value">@courseTime</span>
+							</div>
+							<div class="detail-row">
+								<span class="detail-label">سطح مهارت</span>
+								<span class="detail-value">@level</span>
+							</div>
+
+							<div class="detail-row">
+								<span class="detail-label">آخرین به‌روزرسانی</span>
+								<span class="detail-value">@(DateTimeOffset.Now.AddDays(-7).DateToPersian())</span>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</section><!-- پایان بخش جزئیات دوره -->
+
+</main>

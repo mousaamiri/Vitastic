@@ -1,0 +1,415 @@
+@model Vitastic.Web.Models.ViewModels.UpsertCoursePartialViewModel
+@{
+  Layout = "";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+  <div class="alrt alert-danger">@TempData["ErrorMessage"] </div>
+  <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">بستن</button>
+}
+else if (@Model is null)
+{
+  <div class="alrt alert-danger">خطایی در دریافت اطلاعات رخ دادهه است</div>
+  <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">بستن</button>
+}
+else
+{
+  <div class="modal-header">
+    <h5 class="modal-title">افزودن دوره جدید</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  <div class="modal-body">
+    @if (Model.CourseId is not null)
+    {
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <a type="button" class="btn btn-primary btn-sm ms-2" href="javascript:void(0)" onclick="UpsertSections('@Model.CourseId')">
+            + ویرایش بخش های دوره
+          </a>
+        </div>
+
+      </div>
+    }
+    <form id="createCourseForm" method="post" asp-action="Upsert"
+          enctype="multipart/form-data"
+          asp-controller="CourseManager" asp-area="AdminPanel">
+      @Html.AntiForgeryToken()
+      <input type="hidden" asp-for="CourseId"/>
+      <div class="row">
+
+        <div class="col-xl-3 col-lg-4">
+          <div class="d-inline-block position-relative me-4 mb-3 mb-lg-0 account-profile">
+            <div id="videoPreviewContainer" class="avatar-preview rounded"
+                 style="display: flex; justify-content: center; align-items: center;">
+              @if (string.IsNullOrEmpty(Model.DemoVideoFilePath?.Trim()))
+              {
+                <img src="~/shared/panel/images/course.webp"
+                     style="background-size: cover; width: 150px; padding-top:20px;
+                       padding-bottom:20px; margin: auto; border: dashed;" alt=""/>
+              }
+              else
+              {
+                <video src="@Model.DemoVideoFilePath.ToString()" alt=""
+                       style="background-size: cover; width: 150px; padding-top:20px;
+                       padding-bottom:20px; margin: auto; border: dashed;"
+                       class="rounded-4 profile-avatar"></video>
+              }
+
+            </div>
+            <div class="upload-link" title="" data-toggle="tooltip" data-placement="right" data-original-title="update">
+              <input asp-for="@Model.CourseDemoVideoFile" type="file" class="update-flie" accept="video/*">
+              <i class="fa fa-video fs-16"></i>
+            </div>
+          </div>
+
+          <div class="mb-3 author-profile">
+            <div class="author-media">
+              <img id="imagePreview" src="@(string.IsNullOrEmpty(Model.ImageFilePath?.Trim())
+                                            ? Url.Content("~/shared/panel/images/user.jpg")
+                                            : Model.ImageFilePath)" alt="">
+              <div class="upload-link" title="" data-toggle="tooltip" data-placement="right"
+                   data-original-title="update">
+                <input asp-for="@Model.CourseImageFile" type="file" accept="image/*" class="update-flie">
+                <i class="fa fa-camera"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="course-level" class="form-label">سطح دوره</label>
+            <select type="text"
+                    asp-items="@Model.Levels"
+                    asp-for="@Model.Level" class="form-control" id="course-level" rows="3"></select>
+          </div>
+
+          <div class="mb-3">
+            <label for="course-level" class="form-label">مربی دوره</label>
+            <select type="text"
+                    asp-for="@Model.InstructorId"
+                    asp-items="@Model.Instructors"
+                    class="form-control" id="course-instructor" rows="3"></select>
+          </div>
+
+          <div class="mb-3">
+            <label for="course-level" class="form-label">دسته بندی دوره</label>
+            <select type="text"
+                    asp-for="@Model.CategoryId"
+                    asp-items="@Model.Categories"
+                    class="form-control" id="course-instructor" rows="3"></select>
+          </div>
+
+        </div>
+
+        <div class="col-xl-9 col-lg-8">
+          <div class="mb-3">
+            <label for="title" class="form-label">عنوان دوره</label>
+            <input type="text" asp-for="@Model.Title" class="form-control" id="title" required autocomplete="true">
+          </div>
+
+          <div class="mb-3">
+            <label for="slug" class="form-label">نامک</label>
+            <input type="text" asp-for="@Model.Slug" class="form-control" id="slug" rows="3"></input>
+          </div>
+
+          <div class="mb-3">
+            <label for="course-level" class="form-label">برچسب های دوره</label>
+            <select asp-for="SelectTags" asp-items="@Model.Tags"
+                    multiple class="default-select form-control wide mt-3">
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="short-description" class="form-label">توضیحات کوتاه دروه</label>
+            <textarea asp-for="@Model.ShortDescription" class="form-control" id="short-description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">توضیحات</label>
+            <textarea asp-for="@Model.Description" class="form-control" id="description" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">بستن</button>
+    <button type="button" class="btn btn-primary" onclick="submitCreateForm(event)">ذخیره</button>
+  </div>
+
+  <div class="modal fade" id="mainModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+
+      <div class="modal-content" id="mainModalContent">
+
+        <!-- replace with partial view -->
+      </div>
+    </div>
+  </div>
+}
+<style>
+  #mainModal {
+    z-index: 1060 !important;
+  }
+  #mainModal .modal-backdrop {
+    z-index: 1055 !important;
+  }
+</style>
+<script>
+    'use strict';
+    $('.default-select').selectpicker();
+    console.log('🔴 1. Script file loaded');
+
+    function UpsertSections(courseId) {
+      console.log('🎯 BUTTON UPSERT SECTIONS CLICKED!');
+$.ajax(
+  {
+    url :`/admin/CourseManager/${courseId}/UpsertSections`,
+    type: 'GET',
+    success: function (data) {
+      console.log("Success : ",JSON.stringify(data));
+      $('#mainModalContent').html(data);
+      $('#mainModal').modal('show');
+    },
+    error: function (xhr, status, error) {
+      console.log(`Error : ${xhr.responseText} , error: ${error}`);
+    }
+  }
+)
+
+    }
+
+    const videoInput = document.getElementById("CourseDemoVideoFile");
+    const videoPreviewContainer = document.getElementById("videoPreviewContainer");
+    const imageInput = document.getElementById("CourseImageFile");
+    const imagePreview = document.getElementById("imagePreview");
+
+    const MAX_IMAGE_SIZE = 3 * 1024 * 1024;//2 MB
+    const MAX_VIDEO_SIZE = 20 * 1024 * 1024;//20 MB
+    const MAX_VIDEO_DURATION = 60 * 5;//5 MIN
+
+    const allowedImageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const allowedVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
+
+    const allowedAspectRatios = [
+      {name: "1:1", value: 1},
+      {name: "16:9", value: 16 / 9}
+    ];
+
+    function showError(message) {
+      alert(message);
+    }
+
+    function clearFileInput(input) {
+      console.log("clear file input ");
+      if (input) input.value = "";
+    }
+
+    function isRatioValid(width, height, tolerance = 0.03) {
+      console.log("is ratio valid");
+      const ratio = width / height;
+      return allowedAspectRatios.some(r => Math.abs(ratio - r.value) <= tolerance);
+    }
+
+    function getClosestRationName(width, height, tolerance = 0.03) {
+      console.log("get closest ration name");
+      const ratio = width / height;
+      const found = allowedAspectRatios.find(r => Math.abs(ratio - r.value) <= tolerance);
+      return found ? found.name : null;
+    }
+
+    // Image validation
+    if (imageInput) {
+      imageInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+        if (!allowedImageTypes.includes(file.type)) {
+          showError("فقط فایل‌های تصویری jpg, jpeg, png, webp مجاز هستند.");
+          clearFileInput(this);
+          imagePreview.src = "/shared/panel/images/user.jpg";
+          return;
+        }
+
+        if (file.size > MAX_IMAGE_SIZE) {
+          showError("حجم تصویر نباید بیشتر از 3 مگابایت باشد.");
+          clearFileInput(this);
+          imagePreview.src = "/shared/panel/images/user.jpg";
+          return;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = function () {
+          const width = img.width;
+          const height = img.height;
+
+          if (!isRatioValid(width, height)) {
+            showError(`نسبت تصویر مجاز نیست.\nابعاد فعلی: ${width} × ${height}\nنسبت‌های مجاز: 1:1 یا 16:9`);
+            clearFileInput(imageInput);
+            imagePreview.src = "/shared/panel/images/user.jpg";
+            URL.revokeObjectURL(objectUrl);
+            return;
+          }
+
+          const ratioName = getClosestRationName(width, height);
+          console.log(`Image valid. Size: ${width}x${height}, Ratio: ${ratioName}`);
+
+          imagePreview.src = objectUrl;
+        };
+        img.onerror = function () {
+          showError("فایل تصویر معتبر نیست.");
+          clearFileInput(imageInput);
+          imagePreview.src = "/shared/panel/images/user.jpg";
+          URL.revokeObjectURL(objectUrl);
+        };
+        img.src = objectUrl;
+      })
+    }
+    // Video validation
+    if (videoInput) {
+      let currentVideoUrl = null; // ذخیره URL فعلی
+
+      videoInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        // پاک‌سازی URL قبلی
+        if (currentVideoUrl) {
+          URL.revokeObjectURL(currentVideoUrl);
+          currentVideoUrl = null;
+        }
+
+        if (!file) {
+          resetVideoPreview();
+          return;
+        }
+
+        if (!allowedVideoTypes.includes(file.type)) {
+          showError("فقط فایل‌های ویدیویی MP4, WEBM, MOV مجاز هستند.");
+          clearFileInput(this);
+          resetVideoPreview();
+          return;
+        }
+
+        if (file.size > MAX_VIDEO_SIZE) {
+          showError("حجم ویدئو نباید بیشتر از 20 مگابایت باشد.");
+          clearFileInput(this);
+          resetVideoPreview();
+          return;
+        }
+
+        currentVideoUrl = URL.createObjectURL(file);
+        const video = document.createElement("video");
+        video.preload = "metadata";
+
+        video.addEventListener("loadedmetadata", function () {
+          if (!isFinite(video.duration) || video.duration === 0) {
+            showError("خطا در خواندن اطلاعات ویدئو");
+            clearFileInput(videoInput);
+            resetVideoPreview();
+            if (currentVideoUrl) {
+              URL.revokeObjectURL(currentVideoUrl);
+              currentVideoUrl = null;
+            }
+            return;
+          }
+
+          const duration = video.duration;
+
+          if (duration > MAX_VIDEO_DURATION) {
+            showError(`مدت ویدئو نباید بیشتر از ${MAX_VIDEO_DURATION / 60} دقیقه باشد.`);
+            clearFileInput(videoInput);
+            resetVideoPreview();
+            if (currentVideoUrl) {
+              URL.revokeObjectURL(currentVideoUrl);
+              currentVideoUrl = null;
+            }
+            return;
+          }
+
+          // ویدئو معتبره - نمایش preview
+          videoPreviewContainer.innerHTML = `
+          <video controls
+                 class="rounded-4 profile-avatar"
+                 style="width: 150px; height: auto; padding-top:20px; padding-bottom:20px; margin: auto; border: dashed;">
+            <source src="${currentVideoUrl}" type="${file.type}">
+            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+          </video>
+        `;
+        });
+
+        video.addEventListener("error", function (e) {
+          console.error("Video error:", e);
+          showError("فایل ویدئویی معتبر نیست یا خراب است.");
+          clearFileInput(videoInput);
+          resetVideoPreview();
+          if (currentVideoUrl) {
+            URL.revokeObjectURL(currentVideoUrl);
+            currentVideoUrl = null;
+          }
+        });
+
+        video.src = currentVideoUrl;
+      });
+
+      // تابع کمکی برای reset کردن preview
+      function resetVideoPreview() {
+        videoPreviewContainer.innerHTML = `
+        <img src="/shared/panel/images/course.webp" alt=""
+             style="background-size: cover; width: 150px; padding-top:20px; padding-bottom:20px; margin: auto; border: dashed;"
+             class="rounded-4 profile-avatar">
+      `;
+      }
+    }
+
+    function submitCreateForm(event) {
+      const form = document.getElementById("createCourseForm");
+
+      if (!form) {
+        console.error("Form not found");
+        return;
+      }
+
+      const formData = new FormData(form);
+      const submitButton = event.target;
+
+      submitButton.disabled = true;
+      submitButton.textContent = "در حال ذخیره...";
+      debugger
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(response => {
+          if (!response.ok) {
+            debugger
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            debugger
+            const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
+            if (modal) modal.hide();
+            debugger
+            alert(data.message || 'دوره با موفقیت ایجاد شد');
+
+            location.reload();
+          } else {
+            debugger
+            alert(data.message || 'خطایی رخ داده است');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('خطا در ارسال اطلاعات. لطفاً دوباره تلاش کنید.');
+        })
+        .finally(() => {
+          submitButton.disabled = false;
+          submitButton.textContent = "ذخیره";
+        });
+    }
+
+</script>

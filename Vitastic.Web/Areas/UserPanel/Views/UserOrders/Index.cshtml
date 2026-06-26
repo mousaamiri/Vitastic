@@ -1,0 +1,371 @@
+@using Vitastic.Web.Models.DTOs.Order
+@model PaginatedData<Vitastic.Web.Models.DTOs.Order.OrderDto>
+@{
+  ViewData["Title"] = "سفارشات من";
+  var currentStatus = ViewBag.CurrentStatus as OrderStatusDto?;
+}
+
+@* ============================================ *@
+@* REGION: Page Header                          *@
+@* ============================================ *@
+<div class="bg-light py-4 mb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h1 class="h3 mb-2 mb-md-0">سفارشات من</h1>
+      </div>
+      <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 justify-content-md-end">
+            <li class="breadcrumb-item"><a href="/">خانه</a></li>
+            <li class="breadcrumb-item"><a href="/UserPanel">پنل کاربری</a></li>
+            <li class="breadcrumb-item active" aria-current="page">سفارشات</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+@* ============================================ *@
+@* REGION: Main Content                         *@
+@* ============================================ *@
+<section class="mb-5">
+  <div class="container">
+
+@* Error/Success Messages *@
+@if (TempData["ErrorMessage"] != null)
+{
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+}
+
+@* ================================ *@
+@* REGION: Status Filter Tabs       *@
+@* ================================ *@
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <ul class="nav nav-pills justify-content-center" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Completed ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Completed)">
+              <i class="bi bi-check-circle me-1"></i>
+              تکمیل شده
+            </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Pending ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Pending)">
+              <i class="bi bi-clock me-1"></i>
+              در انتظار
+            </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Processing ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Processing)">
+              <i class="bi bi-arrow-repeat me-1"></i>
+              در حال پردازش
+            </a>
+          </li>
+
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Cancelled ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Cancelled)">
+              <i class="bi bi-x-circle me-1"></i>
+              لغو شده
+            </a>
+          </li>
+
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Refunded ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Refunded)">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>
+              بازگشت وجه
+            </a>
+          </li>
+
+          <li class="nav-item" role="presentation">
+            <a class="nav-link @(currentStatus == OrderStatusDto.Failed ? "active" : "")"
+               href="?status=@((int)OrderStatusDto.Failed)">
+              <i class="bi bi-exclamation-circle me-1"></i>
+              ناموفق
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    @* ================================ *@
+    @* REGION: Orders Table             *@
+    @* ================================ *@
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">لیست سفارشات</h5>
+      </div>
+
+      <div class="card-body p-0">
+
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+          <div class="text-center py-5">
+            <i class="bi bi-bag-x fs-1 text-muted"></i>
+            <p class="mt-3 text-muted">هیچ سفارشی یافت نشد</p>
+          </div>
+        }
+        else
+        {
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>شماره سفارش</th>
+                  <th>تعداد آیتم</th>
+                  <th>مبلغ نهایی</th>
+                  <th>وضعیت</th>
+                  <th>روش پرداخت</th>
+                  <th>تاریخ</th>
+                  <th>عملیات</th>
+
+                </tr>
+              </thead>
+
+              <tbody>
+                @foreach (var order in Model.Items)
+                {
+                  <tr>
+                    <td>
+                      <span class="fw-bold">
+                        @order.OrderNumber
+                      </span>
+                    </td>
+
+                    <td>
+                      @order.ItemsCount
+                    </td>
+
+                    <td>
+                      <span class="text-success fw-bold">
+                        @order.FinalAmount.ToString("N0") تومان
+                      </span>
+                    </td>
+
+                    <td>
+                      @if (order.IsPaid)
+                      {
+                        <span class="badge bg-success">پرداخت شده</span>
+                      }
+                      else
+                      {
+                        <span class="badge bg-warning text-dark">در انتظار پرداخت</span>
+                      }
+                    </td>
+
+                    <td>
+                      @order.PaymentMethod
+                    </td>
+
+                    <td>
+                      @order.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd")
+                    </td>
+                    <td>
+                      <button type="button" 
+                              class="btn btn-sm btn-outline-primary" 
+                              onclick="loadOrderDetails('@order.Id')">
+                        <i class="bi bi-eye me-1"></i>
+                        جزئیات
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+      </div>
+    </div>
+
+    @* ================================ *@
+    @* REGION: Pagination               *@
+    @* ================================ *@
+    @{
+      var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+    }
+
+    @if (totalPages > 1)
+    {
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+          @for (int i = 1; i <= totalPages; i++)
+          {
+            <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+              <a class="page-link"
+                 href="?pageNumber=@i&pageSize=@Model.PageSize&status=@((int?)currentStatus)">
+                @i
+              </a>
+            </li>
+          }
+
+        </ul>
+      </nav>
+    }
+
+  </div>
+</section>
+
+@* ================================ *@
+@* REGION: Order Details Modal      *@
+@* ================================ *@
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="orderDetailsModalLabel">
+          <i class="bi bi-receipt me-2"></i>
+          جزئیات سفارش
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body" id="orderDetailsContent">
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">در حال بارگذاری...</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+      </div>
+    </div>
+  </div>
+</div>
+@* ================================ *@
+@* REGION: JavaScript               *@
+@* ================================ *@
+<script>
+  // Fetch order details and show modal
+  async function loadOrderDetails(orderId) {
+    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+    const contentDiv = document.getElementById('orderDetailsContent');
+
+    // Show loading
+    contentDiv.innerHTML = `
+      <div class="text-center py-4">
+        <div class="spinner-border text-primary"></div>
+      </div>
+    `;
+
+    modal.show();
+
+    try {
+      const response = await fetch(`/UserOrders/Details/${orderId}`);
+      if (!response.ok) throw new Error("خطا در دریافت اطلاعات");
+
+      const order = await response.json();
+
+      // Render the modal content
+      contentDiv.innerHTML = `
+        <div class="row g-3">
+
+          <!-- Order Basic Info -->
+          <div class="col-12">
+            <div class="card bg-light border-0">
+              <div class="card-body">
+                <h6 class="mb-3"><i class="bi bi-info-circle me-2"></i>اطلاعات سفارش</h6>
+
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <small class="text-muted">شماره سفارش:</small>
+                    <p class="fw-bold mb-1">${order.orderNumber}</p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <small class="text-muted">تاریخ ثبت:</small>
+                    <p class="mb-1">${new Date(order.createdAt).toLocaleDateString("fa-IR")}</p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <small class="text-muted">مبلغ نهایی:</small>
+                    <p class="text-success fw-bold mb-1">${order.finalAmount.toLocaleString("fa-IR")} تومان</p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <small class="text-muted">وضعیت:</small>
+                    <p class="mb-1">
+                      <span class="badge ${order.status === "Completed" ? "bg-success" : "bg-warning"}">
+                        ${order.status}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div class="col-md-6">
+                    <small class="text-muted">روش پرداخت:</small>
+                    <p class="mb-1">${order.paymentMethod ?? "نامشخص"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Items List -->
+          <div class="col-12">
+            <h6 class="mb-3"><i class="bi bi-cart me-2"></i>آیتم‌های سفارش</h6>
+
+            <div class="list-group">
+              ${order.items
+          .map(
+            item => `
+                <div class="list-group-item">
+                  <div class="d-flex">
+                    <img src="${item.thumbnailUrl ?? "/images/no-image.png"}"
+                         class="rounded me-3"
+                         style="width: 70px; height: 70px; object-fit: cover;">
+
+                    <div class="flex-grow-1">
+                      <h6 class="fw-bold mb-1">${item.courseTitle}</h6>
+                      <small class="text-muted d-block">مدرس: ${item.instructorFullName ?? "نامشخص"}</small>
+                    </div>
+
+                    <div class="text-start">
+                      <p class="text-success fw-bold mb-0">
+                        ${item.finalPrice.toLocaleString("fa-IR")} تومان
+                      </p>
+                      ${item.hasDiscount
+                ? `<small class="text-danger">(${item.discountPercentage}% تخفیف)</small>`
+                : ""
+              }
+                    </div>
+                  </div>
+                </div>
+              `
+          )
+          .join("")}
+            </div>
+          </div>
+
+        </div>
+      `;
+    } catch (err) {
+      contentDiv.innerHTML = `
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          خطایی رخ داد. لطفا دوباره تلاش کنید.
+        </div>
+      `;
+    }
+  }
+</script>

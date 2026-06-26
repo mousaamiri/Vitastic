@@ -1,0 +1,9 @@
+﻿@{
+  ViewData["CourseTitle"] = "خطا";
+}
+
+<div class="error-page">
+  <h1>@ViewBag.ErrorCode</h1>
+  <p>@ViewBag.ErrorMessage</p>
+  <a href="@Url.Action("Index", "Home")" class="btn-primary">بازگشت به صفحه اصلی</a>
+</div>

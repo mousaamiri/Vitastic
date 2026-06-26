@@ -1,0 +1,81 @@
+@using Vitastic.Web.Helper
+@model Vitastic.Web.Models.Courses.ShopCoursesResponse
+<div class="col-lg-6 col-md-6">
+  <div class="course-card">
+
+    <div class="course-image">
+      <img src="/img/education/course-3.webp" alt="@Model.Title" class="img-fluid">
+
+      @if (Model.StudentCount > 10)
+      {
+        <div class="course-badge">پرفروش‌ترین</div>
+      }
+
+      <div class="course-price">
+        @if (Model.Price == 0)
+        {
+          <span>رایگان</span>
+        }
+        else
+        {
+          <span>@Model.Price.ToString("N0") تومان</span>
+        }
+      </div>
+    </div>
+
+    <div class="course-content">
+
+      <div class="course-meta">
+        <span class="category">برنامه‌نویسی</span>
+        <span class="level">@Model.Level.LevelTranslator()</span>
+      </div>
+
+      <h3>@Model.Title</h3>
+
+      <p>@Model.ShortDescription</p>
+
+      <div class="course-stats">
+
+        <div class="stat">
+          <i class="bi-clock"></i>
+          <span>زمان : @Model.Duration</span>
+        </div>
+
+        <div class="stat">
+          <i class="bi-people"></i>
+          <span>@Model.StudentCount.ToString("N0") دانش آموز</span>
+        </div>
+
+        <div class="rating">
+          @{
+            var fullStars = Model.Rate;
+            for (int i = 0; i < 5; i++)
+            {
+              if (i < fullStars)
+              {
+                <i class="bi bi-star-fill"></i>
+              }
+              else
+              {
+                <i class="bi bi-star"></i>
+              }
+            }
+          }
+          <span>@Model.Rate (@Model.RaterCount نظر)</span>
+        </div>
+
+      </div>
+
+      <div class="instructor-info">
+        <img src="https://localhost:44314/admin-assets/assets/img/avatars/@(Model.InstructorAvatarName)"
+             alt="@Model.InstructorName" class="instructor-avatar">
+        <span class="instructor-name">@Model.InstructorName</span>
+      </div>
+
+      <a asp-controller="Shop" asp-action="CourseDetails" asp-route-courseId="@Model.Id" class="btn-course">
+        اکنون ثبت نام کنید
+      </a>
+
+    </div>
+  </div>
+</div>

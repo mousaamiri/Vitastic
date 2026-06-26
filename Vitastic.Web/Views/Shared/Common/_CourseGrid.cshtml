@@ -1,0 +1,65 @@
+@model Vitastic.Web.Models.ViewModels.CourseListViewModel
+
+@* ============================================ *@
+@* PARTIAL: Course Grid + Pagination            *@
+@* ============================================ *@
+@* --- Active Filters Tags --- *@
+@* @await Html.PartialAsync("Common/_ActiveFilters", Model.Filter) *@
+
+@if (!Model.Courses.Items.Any())
+{
+  @* --- Empty State --- *@
+  <section id="error-404" class="error-404 section">
+
+    <div class="container aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
+
+      <div class="error-wrapper">
+        <div class="row align-items-center">
+          <div class="col-lg-6 aos-init aos-animate" data-aos="fade-right" data-aos-delay="200">
+            <div class="error-illustration">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div class="circle circle-1"></div>
+              <div class="circle circle-2"></div>
+              <div class="circle circle-3"></div>
+            </div>
+          </div>
+          <div class="col-lg-6 aos-init aos-animate" data-aos="fade-left" data-aos-delay="300">
+            <div class="error-content">
+              <span class="error-badge aos-init aos-animate" data-aos="zoom-in" data-aos-delay="400">خطا</span>
+              <h2 class="error-title aos-init aos-animate" data-aos="fade-up" data-aos-delay="600">چیزی پیدا نشد :(</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+}
+else
+{
+  <div id="courseGrid">
+    @* --- Results Info --- *@
+    <div class="comments-stats mt-0 mb-3">
+      <span class="count">
+        نمایش @((Model.Filter.PageNumber - 1) * Model.Filter.PageSize + 1)
+        تا @(Math.Min(Model.Filter.PageNumber * Model.Filter.PageSize, Model.Courses.TotalCount))
+        از @Model.Courses.TotalCount دوره
+      </span>
+    </div>
+
+    @* --- Grid --- *@
+    <div class="row gy-4">
+      @foreach (var course in Model.Courses.Items)
+      {
+        @await Html.PartialAsync("Common/_CourseCard", course)
+      }
+    </div>
+
+    @* --- Pagination --- *@
+    @await Html.PartialAsync("Common/_Pagination", Model)
+  </div>
+}
+
+

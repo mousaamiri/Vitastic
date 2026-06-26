@@ -1,0 +1,218 @@
+@model Vitastic.Web.Models.ViewModels.CourseListViewModel
+@{
+  ViewData["CourseTitle"] = "دوره‌های آموزشی من";
+}
+
+<!-- #region Page Header -->
+<!-- Page Header Section -->
+<div class="page-title light-background mb-4">
+  <div class="container-fluid justify-content-between align-items-center">
+    <h1 class="mb-3 mb-lg-0">دوره‌های آموزشی من</h1>
+    <nav class="breadcrumbs mt-2">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">خانه</a></li>
+        <li class="breadcrumb-item active current">دوره ها</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<!-- #endregion -->
+
+<form id="filterForm" method="get" action="@Url.Action("Index", "UserCourses", new { area = "UserPanel" })">
+
+  <!-- #region Main Content Area -->
+  <!-- Main Content Wrapper using the target layout classes -->
+  <div class="col-xl-12 active-p">
+    <div class="row">
+
+      <!-- #region Sidebar Filters -->
+      <!-- Filter Sidebar structured as a Card -->
+      <div class="col-xl-3 col-lg-4">
+        <div class="card">
+          <div class="card-header border-0 pb-0">
+            <h4 class="card-title">فیلتر ها</h4>
+          </div>
+          <div class="card-body">
+            <p class="alert alert-primary">@Model.Courses.TotalCount دوره یافت شد</p>
+
+            <!-- Category Filter -->
+            <div class="mb-3">
+              <label class="form-label">دسته‌بندی</label>
+              <select name="CategoryId" id="CategoryIdInputFilter" class="default-select form-control wide">
+                <option value="">همه دسته‌بندی‌ها</option>
+                @foreach (var cat in Model.Categories)
+                {
+                  <option value="@cat.Id" selected="@(Model.Filter.CategoryId == cat.Id)">
+                    @cat.Name
+                  </option>
+                }
+              </select>
+            </div>
+
+            <!-- Level Filter -->
+            <div class="mb-3">
+              <label class="form-label">سطح دوره</label>
+              <select name="Level" id="levelInputFilter" class="default-select form-control wide">
+                <option value="">همه سطوح</option>
+                @foreach (var level in Model.Levels)
+                {
+                  <option value="@level.Value" selected="@Equals(Model.Filter.Level, level.Value)">
+                    @level.Text
+                  </option>
+                }
+              </select>
+            </div>
+
+            <!-- Price Range Filter -->
+            <div class="mb-3">
+              <label class="form-label">محدوده قیمت</label>
+              <div class="d-flex align-items-center">
+                <input type="number" name="MinUnitPrice" id="minPriceInputFilter" value="@Model.Filter.MinPrice" placeholder="از (تومان)" class="form-control form-control-sm me-2" />
+                <span>تا</span>
+                <input type="number" name="MaxUnitPrice" id="maxPriceInputFilter" value="@Model.Filter.MaxPrice" placeholder="تا (تومان)" class="form-control form-control-sm ms-2" />
+              </div>
+            </div>
+
+            <!-- Checkbox Filters -->
+            <div class="mb-3">
+              <div class="form-check custom-checkbox mb-2">
+                <input type="checkbox" class="form-check-input" name="IsFree" id="isFreeInputFilter" value="true" checked="@(Model.Filter.IsFree == true)">
+                <label class="form-check-label" for="isFreeInputFilter">فقط دوره‌های رایگان</label>
+              </div>
+              <div class="form-check custom-checkbox">
+                <input type="checkbox" class="form-check-input" name="HasCertificate" id="hasCertificateInputFilter" value="true" checked="@(Model.Filter.HasCertificate == true)">
+                <label class="form-check-label" for="hasCertificateInputFilter">دارای گواهینامه</label>
+              </div>
+            </div>
+
+            <!-- Hidden Inputs for Pagination -->
+            <input type="hidden" id="pageNumberInputFilter" name="PageNumber" value="1" />
+            <input type="hidden" id="pageSizeInputFilter" name="PageSize" value="@Model.Filter.PageSize" />
+          </div>
+        </div>
+      </div>
+      <!-- #endregion -->
+      <!-- #region Course Grid & Search -->
+      <!-- Main Grid Section -->
+      <div class="col-xl-9 col-lg-8">
+        <!-- Top Toolbar (Search & Sort) -->
+        <div class="card mb-3">
+          <div class="card-body d-flex justify-content-between align-items-center p-3">
+            <div class="search-box">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="searchTermInputFilter" name="Search" value="@Model.Filter.SearchTerm" placeholder="نام دوره یا مدرس..." class="form-control">
+              </div>
+            </div>
+            <div class="sort-dropdown">
+              <select id="sortBySelectInputFilter" name="SortBy" class="default-select form-control wide">
+                <option value="">مرتب سازی بر اساس : @Model.SortOptions.First().Text</option>
+                @foreach (var sort in Model.SortOptions)
+                {
+                  <option value="@sort.Value" selected="@Equals(Model.Filter.SortBy, sort.Value)">
+                    @sort.Text
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content holding the Grid -->
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="pills-list" role="tabpanel">
+            <!-- Course Grid Partial View Container -->
+            <!-- NOTE: Ensure the partial view uses 'col-xl-4 col-sm-6' etc., for its card items to match target -->
+            <div class="row" id="courseGrid">
+              @await Html.PartialAsync("Common/_CourseGrid", Model)
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- #endregion -->
+
+    </div>
+  </div>
+  <!-- #endregion -->
+</form>
+
+<!-- #region Scripts -->
+<script>
+  // Initialize filter scripts on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", function() {
+
+    const filterForm = document.getElementById("filterForm");
+    const courseGrid = document.getElementById("courseGrid");
+    const inputs = filterForm.querySelectorAll("input, select");
+
+    if (!filterForm || !courseGrid) return;
+
+    const searchInput = document.querySelector("input[name='Search']");
+
+    // Event listeners for automatic updates
+    inputs.forEach(inp => inp.addEventListener("change", updateCourses));
+    searchInput.addEventListener("input", debounce(updateCourses, 400));
+
+    // Function to fetch and update courses via AJAX
+    function updateCourses() {
+      const formData = new URLSearchParams(new FormData(filterForm));
+
+      showLoading();
+
+      fetch(`/UserCourses?${formData.toString()}`, {
+        method: "GET",
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(async (response) => {
+          const contentType = response.headers.get("content-type");
+
+          // Handle JSON Error response
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            hideLoading();
+            showNotification(data.message || "خطای ناشناخته", "error");
+            return;
+          }
+
+          // Handle HTML Success response
+          const html = await response.text();
+          courseGrid.innerHTML = html;
+          hideLoading();
+        })
+        .catch(err => {
+          hideLoading();
+          showNotification("خطا در اتصال به سرور", "error");
+        });
+    }
+
+    // Show loading spinner
+    function showLoading() {
+      courseGrid.innerHTML =
+        `<div class="col-12 text-center py-5">
+                      <div class="spinner-border text-primary"></div>
+                      <p class="mt-3">در حال بارگذاری...</p>
+                   </div>`;
+    }
+
+    function hideLoading() { }
+
+    // Notification handler
+    function showNotification(message, type = "error") {
+      if (typeof toastr !== "undefined") {
+        toastr[type](message);
+        return;
+      }
+      alert(message);
+    }
+
+    // Debounce function to limit rapid requests
+    function debounce(fn, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+      }
+    }
+  });
+</script>
+<!-- #endregion -->

@@ -1,0 +1,52 @@
+
+@{
+    ViewBag.Title = "ثبت نام موفق";
+    Layout = "_Layout";
+}
+
+<!-- Page CourseTitle -->
+<div class="page-title light-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">ثبت‌نام موفق</h1>
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a class="ajax-link" href="/">خانه</a></li>
+                <li class="current">ثبت‌نام موفق</li>
+            </ol>
+        </nav>
+    </div>
+</div><!-- End Page CourseTitle -->
+<!-- Success Section -->
+<section id="register-success" class="enroll section mt-0 mb-4">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="enrollment-form-wrapper text-center">
+                    <div class="enrollment-header mb-5" data-aos="fade-up" data-aos-delay="200">
+                        <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                            <strong>موفقیت!</strong> ثبت‌نام شما با موفقیت انجام شد.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+                        </div>
+                        <h2>ثبت‌نام شما با موفقیت انجام شد!</h2>
+                        <p>یک لینک فعال‌سازی به آدرس ایمیل <strong>@Model.Email</strong> ارسال شده است.</p>
+                        <p>لطفاً ایمیل خود را بررسی کنید (شامل پوشه هرزنامه یا اسپم) و با کلیک روی لینک ارسال‌شده، حساب کاربری خود را فعال کنید.</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            @* <p class="enrollment-note mt-3">
+                                <i class="bi bi-shield-check me-2"></i>
+                                اگر ایمیل را دریافت نکردید، می‌توانید <a href="resend-activation" class="text-primary">درخواست ارسال مجدد لینک</a> کنید.
+                            </p> *@
+                            <p class="mt-3">
+                                <a href="/" class="btn btn-enroll ajax-link">
+                                    <i class="bi bi-house-door me-2"></i>
+                                    بازگشت به صفحه اصلی
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section><!-- /Success Section -->

@@ -1,0 +1,195 @@
+@model Vitastic.Web.Infrastructure.ApiClient.PaginatedData<Vitastic.Web.Models.DTOs.Disocunt.DiscountDto>?
+@if (TempData["ErrorMessage"] != null || Model is null)
+{
+  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+else
+{
+  @section AdditionalStyle
+  {
+    <link href="~/shared/panel/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" asp-append-version="true"
+          rel="stylesheet">
+
+    <link href="~/shared/panel/vendor/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Clockpicker -->
+    <link href="~/shared/panel/vendor/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
+
+    <!-- Material color picker -->
+    <link href="~/shared/panel/vendor/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
+
+    <!-- Pick date -->
+    <link rel="stylesheet" href="~/shared/panel/vendor/pickadate/themes/default.css">
+    <link rel="stylesheet" href="~/shared/panel/vendor/pickadate/themes/default.date.css">
+  }
+
+  <div class="tab-content" id="myTabContent">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <a onclick="createDiscount()" href="javascript:void(0)" class="btn btn-primary btn-sm ms-2">+ افزودن کد تخفیف</a>
+    </div>
+
+    <div class="tab-pane fade show active" id="jobs-tab-pane" role="tabpanel" aria-labelledby="jobs-tab" tabindex="0">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive active-projects style-1">
+            <div id="empoloyees-tblwrapper_wrapper" class="dataTables_wrapper no-footer">
+              <table id="empoloyees-tblwrapper" class="table dataTable no-footer"
+                     aria-describedby="empoloyees-tblwrapper_info">
+                <thead>
+                  <tr>
+                    <th class="sorting sorting_asc " tabindex="0" aria-controls="empoloyees-tblwrapper"
+                        rowspan="1" colspan="1" aria-sort="ascending"
+                        aria-label="عنوان: activate to sort column descending"
+                        style="width: 143.413px; text-align:start;">
+                      عنوان
+                    </th>
+                    <th class="sorting sorting_asc " tabindex="0" aria-controls="empoloyees-tblwrapper"
+                        rowspan="1" colspan="1" aria-sort="ascending"
+                        aria-label="کد: activate to sort column descending"
+                        style="width: 143.413px; text-align:start;">
+                      کد
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="نوع کد : activate to sort column ascending"
+                        style="width: 97.5625px; text-align:start;">
+                      نوع کد
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="مقدار: activate to sort column ascending"
+                        style="width: 103.875px; text-align:start;">
+                      مقدار
+                    </th>
+
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="تاریخ شروع: activate to sort column ascending"
+                        style="width: 254.75px; text-align:start;">
+                      تاریخ شروع
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="تاریخ پایان: activate to sort column ascending"
+                        style="width: 254.75px; text-align:start;">
+                      تاریخ پایان
+                    </th>
+                    <th class="sorting" tabindex="0" aria-controls="empoloyees-tblwrapper" rowspan="1"
+                        colspan="1" aria-label="اقدامات: activate to sort column ascending"
+                        style="width: 146.312px; text-align:start;">
+                      اقدامات
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  @foreach (var discount in Model!.Items)
+                  {
+                    <tr class="odd">
+                      <td>@(discount.Title)</td>
+                      <td class="text-black sorting_1">@discount.Code</td>
+                      <td>@(discount.Type == "Percentage" ? "درصدی" : "مقدار ثابت")</td>
+                      <td>@(discount.Type == "Percentage" ? discount.Value.ToString("####") + "%" : discount.Value.ToString("##,###"))</td>
+                      <td>@discount!.StartDate.ToString("d")</td>
+                      <td>@discount.EndDate.ToString("d")</td>
+
+                      <td>
+                        <a onclick="editDiscount('@discount.Id')" href="javascript:void(0);"
+                           class="btn btn-primary light btn-sharp">
+                          <svg class="icon-box icon-box-xs bg-primary-light" width="8" height="8" viewBox="0 0 16 16"
+                               fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.16492 13.6286H14" stroke="#0D99FF" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                  d="M8.52001 2.52986C9.0371 1.91186 9.96666 1.82124 10.5975 2.32782C10.6324 2.35531 11.753 3.22586 11.753 3.22586C12.446 3.64479 12.6613 4.5354 12.2329 5.21506C12.2102 5.25146 5.87463 13.1763 5.87463 13.1763C5.66385 13.4393 5.34389 13.5945 5.00194 13.5982L2.57569 13.6287L2.02902 11.3149C1.95244 10.9895 2.02902 10.6478 2.2398 10.3849L8.52001 2.52986Z"
+                                  stroke="#0D99FF" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M7.34723 4.00059L10.9821 6.79201" stroke="#0D99FF" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                          </svg>
+
+                        </a>
+                        <a onclick="removeDiscount('@discount.Id')" href="javascript:void(0);"
+                           class="btn btn-danger light btn-sharp">
+                          <svg width="15" height="16" viewBox="0 0 15 16" fill="none"
+                               xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1.875 4.25H3.125H13.125" stroke="#FF5B5B" stroke-width="1.2"
+                                  stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M11.875 4.25V13C11.875 13.3315 11.7433 13.6495 11.5089 13.8839C11.2745 14.1183 10.9565 14.25 10.625 14.25H4.375C4.04348 14.25 3.72554 14.1183 3.49112 13.8839C3.2567 13.6495 3.125 13.3315 3.125 13V4.25M5 4.25V3C5 2.66848 5.1317 2.35054 5.36612 2.11612C5.60054 1.8817 5.91848 1.75 6.25 1.75H8.75C9.08152 1.75 9.39946 1.8817 9.63388 2.11612C9.8683 2.35054 10 2.66848 10 3V4.25"
+                                  stroke="#FF5B5B" stroke-width="1.2" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M6.25 7.375V11.125" stroke="#FF5B5B" stroke-width="1.2"
+                                  stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path d="M8.75 7.375V11.125" stroke="#FF5B5B" stroke-width="1.2"
+                                  stroke-linecap="round" stroke-linejoin="round"></path>
+                          </svg>
+                        </a>
+
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="mainModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+
+      <div class="modal-content" id="mainModalContent">
+
+        <!-- replace with partial view -->
+      </div>
+    </div>
+  </div>
+}
+
+@section AdditionalScript
+{
+  <!-- Moment.js  -->
+  <script src="~/shared/panel/vendor/moment/moment.min.js"></script>
+
+  <!-- Bootstrap Daterangepicker -->
+  <script src="~/shared/panel/vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+  <script>
+
+
+    function createDiscount() {
+      console.log("creating ...");
+      $.ajax({
+        url: '/admin/DiscountManager/Upsert',
+        type: "GET",
+        success: function (html) {
+          console.log("success ...");
+          $('#mainModalContent').html(html);
+          $('#mainModal').modal('show');
+        },
+        error: function () {
+          console.log("error ...");
+          alert('خطا در دریافت فرم');
+        }
+      });
+    }
+
+    function editDiscount(discountId) {
+      console.log(`Discount id for edit is ${discountId}`);
+      $.ajax({
+        url: `/admin/DiscountManager/Upsert/${discountId}`,
+        type: "GET",
+        success: function (html) {
+          console.log("success ...");
+          $('#mainModalContent').html(html);
+          $('#mainModal').modal('show');
+        },
+        error: function () {
+          console.log("error ...");
+          alert("خطا در دریافت فرم")
+        }
+      })
+    }
+
+    function removeDiscount(discountId) {
+      console.log(`Discount id for delete is ${discountId}`);
+    }
+  </script>
+}

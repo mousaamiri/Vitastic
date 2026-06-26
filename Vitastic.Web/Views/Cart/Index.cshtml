@@ -1,0 +1,798 @@
+@model Vitastic.Web.Models.ViewModels.CartViewModel
+@using Vitastic.Web.Helper.Extensions;
+@{
+  ViewData["CourseTitle"] = "سبد خرید";
+}
+
+<!-- #region Page Container -->
+<div class="container-fluid py-4">
+
+  <!-- #region Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+        <div>
+          <h1 class="h3 mb-1">
+            <i class="bi bi-cart3 me-2 text-primary"></i>سبد خرید
+          </h1>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")" class="text-decoration-none">
+                  <i class="bi bi-house-door"></i> خانه
+                </a>
+              </li>
+              <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Course")" class="text-decoration-none">فروشگاه</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">سبد خرید</li>
+            </ol>
+          </nav>
+        </div>
+        @if (!Model.IsEmpty)
+        {
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+              <i class="bi bi-box-seam me-1"></i>
+              @Model.Cart.ItemsCount مورد
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+  <!-- #endregion -->
+  @if (Model.IsEmpty)
+  {
+    <!-- #region Empty Cart State -->
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="card shadow-sm border-0 text-center py-5">
+          <div class="card-body px-4">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                 style="width: 120px; height: 120px;">
+              <i class="bi bi-cart-x display-3 text-muted"></i>
+            </div>
+            <h4 class="mb-2">سبد خرید شما خالی است</h4>
+            <p class="text-muted mb-4">هنوز هیچ دوره‌ای به سبد خرید خود اضافه نکرده‌اید</p>
+            <a href="@Url.Action("Index", "Course")" class="btn btn-primary px-4">
+              <i class="bi bi-arrow-right me-2"></i>
+              مشاهده دوره‌ها
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #endregion -->
+  }
+  else
+  {
+    <!-- #region Main Content -->
+    <div class="row g-4">
+
+      <!-- #region Cart Items Column -->
+      <div class="col-lg-8">
+
+        <!-- #region Cart Items Card -->
+        <div class="card shadow-lg border rounded-4">
+
+          <!-- #region Card Header -->
+          <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-bag-check me-2 text-primary"></i>
+                محصولات سبد خرید
+              </h5>
+              <button type="button"
+                      class="btn btn-sm btn-outline-danger clear-cart-btn"
+                      id="clearCartBtn">
+                <i class="bi bi-trash me-1"></i>
+                <span class="d-none d-sm-inline">خالی کردن سبد</span>
+              </button>
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region Cart Items Table -->
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="cartItemsTable">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center" style="width: 100px;">تصویر</th>
+                    <th>عنوان دوره</th>
+                    <th class="text-center d-none d-md-table-cell" style="width: 140px;">قیمت</th>
+                    <th class="text-center" style="width: 80px;">عملیات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var item in Model.Cart.Items)
+                  {
+                    <!-- #region Cart Item Row -->
+                    <tr data-item-id="@item.Id" class="cart-item-row">
+                      <td class="text-center">
+                        <img src="@item.CourseImageName"
+                             alt="@item.CourseTitle"
+                             class="rounded"
+                             loading="lazy"
+                             style="width: 72px; height: 72px; object-fit: cover;">
+                      </td>
+                      <td>
+                        <div class="d-flex flex-column">
+                          <h6 class="mb-1 text-truncate" style="max-width: 300px;">
+                            @item.CourseTitle
+                          </h6>
+                          <small class="text-muted">
+                            <i class="bi bi-person me-1"></i>
+                            مدرس: @item.CourseInstructorName
+                          </small>
+                          <!-- UnitPrice visible on mobile only -->
+                          <span class="fw-bold text-primary mt-1 d-md-none">
+                            @item.UnitPrice.ToString("N0") @item.Currency.CurrencyTranslate()
+                          </span>
+                        </div>
+                      </td>
+                      <!-- UnitPrice visible on desktop only -->
+                      <td class="text-center d-none d-md-table-cell">
+                        <span class="fw-bold text-primary">
+                          @item.UnitPrice.ToString("N0") @item.Currency.CurrencyTranslate()
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger remove-from-cart-btn"
+                                data-item-id="@item.Id"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="حذف از سبد">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <!-- #endregion -->
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region Card Footer - Coupon & Continue -->
+          <div class="card-footer bg-light py-3">
+            <div class="row g-3 align-items-center">
+              <div class="col-lg-7">
+                <label for="couponCodeInput" class="form-label small text-muted mb-1">
+                  <i class="bi bi-tag me-1"></i>کد تخفیف دارید؟
+                </label>
+                <div class="input-group" id="couponInputGroup">
+                  <input type="text"
+                         id="couponCodeInput"
+                         class="form-control"
+                         placeholder="مثلاً: SUMMER2026"
+                         maxlength="30"
+                         autocomplete="off"
+                         value="@Model.Summary.AppliedCouponCode">
+
+                  <button class="btn btn-primary" type="button" id="applyCouponBtn">
+                    <span id="applyCouponText">
+                      <i class="bi bi-check2-circle me-1"></i>
+                      <span class="d-none d-sm-inline">اعمال کد</span>
+                    </span>
+                    <span id="applyCouponSpinner" class="d-none">
+                      <span class="spinner-border spinner-border-sm me-1"
+                            role="status"
+                            aria-hidden="true"></span>
+                      <span class="d-none d-sm-inline">بررسی...</span>
+                    </span>
+                  </button>
+
+                  @if (!string.IsNullOrWhiteSpace(Model.Summary.AppliedCouponCode))
+                  {
+                    <button class="btn btn-outline-danger" type="button" id="removeCouponBtn">
+                      <span id="removeCouponText">
+                        <i class="bi bi-x-circle"></i>
+                      </span>
+                      <span id="removeCouponSpinner" class="d-none">
+                        <span class="spinner-border spinner-border-sm"
+                              role="status"
+                              aria-hidden="true"></span>
+                      </span>
+                    </button>
+                  }
+                </div>
+                <!-- Coupon feedback area -->
+                <div id="couponFeedback" class="mt-2 d-none">
+                  <small id="couponFeedbackText"></small>
+                </div>
+              </div>
+              <div class="col-lg-5 text-lg-end" style="margin-top:42px;">
+                <a href="@Url.Action("Index", "Course")"
+                   class="btn btn-outline-secondary w-100 w-lg-auto">
+                  <i class="bi bi-arrow-right me-1"></i>
+                  ادامه خرید
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- #endregion -->
+
+        </div>
+        <!-- #endregion -->
+
+      </div>
+      <!-- #endregion -->
+      <!-- #region Summary Column -->
+      <div class="col-lg-4">
+
+        <!-- #region Summary Card -->
+        <div class="card shadow-lg border rounded-4 position-relative" id="cartSummaryCard">
+
+          <!-- #region Summary Overlay Spinner -->
+          <div id="summaryOverlay"
+               class="d-none position-absolute top-0 start-0 w-100 h-100 align-items-center justify-content-center"
+               style="background: rgba(255,255,255,0.85); z-index: 10; border-radius: inherit;">
+            <div class="text-center">
+              <div class="spinner-border text-primary mb-2" role="status">
+                <span class="visually-hidden">در حال بروزرسانی...</span>
+              </div>
+              <div class="small text-muted">در حال بروزرسانی...</div>
+            </div>
+          </div>
+          <!-- #endregion -->
+          <!-- #region Summary Header -->
+          <div class="card-header bg-white border-bottom py-3">
+            <h5 class="card-title mb-0">
+              <i class="bi bi-receipt me-2 text-primary"></i>
+              خلاصه سفارش
+            </h5>
+          </div>
+          <!-- #endregion -->
+          <!-- #region Summary Body -->
+          <div class="card-body" id="cartSummaryBody">
+
+            <!-- #region Summary Table -->
+            <table class="table table-borderless mb-0">
+              <tbody>
+                <!-- Subtotal -->
+                <tr>
+                  <td class="text-muted ps-0">
+                    <i class="bi bi-calculator me-1"></i>جمع کل:
+                  </td>
+                  <td class="text-end pe-0">
+                    <span class="fw-bold" id="summarySubtotal">
+                      @Model.Summary.Subtotal.ToString("N0")
+                      @Model.Summary.Currency.CurrencyTranslate()
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- Discount -->
+                <tr id="summaryDiscountRow"
+                    class="@(Model.Summary.HasDiscount ? "" : "d-none")">
+                  <td class="text-muted ps-0">
+                    <i class="bi bi-percent me-1"></i>
+                    تخفیف
+                    (<span id="summaryDiscountPercent">@Model.Summary.DiscountPercentage.ToString("0.##")</span>%):
+                  </td>
+                  <td class="text-end pe-0">
+                    <span class="fw-bold text-success" id="summaryDiscountAmount">
+                      - @Model.Summary.DiscountAmount.ToString("N0")
+                      @Model.Summary.Currency.CurrencyTranslate()
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- Shipping -->
+                <tr>
+                  <td class="text-muted ps-0">
+                    <i class="bi bi-truck me-1"></i>هزینه ارسال:
+                  </td>
+                  <td class="text-end pe-0" id="summaryShipping">
+                    @if (Model.Summary.IsFreeShipping)
+                    {
+                      <span class="badge bg-success bg-opacity-10 text-success px-3">
+                        <i class="bi bi-check-circle me-1"></i>رایگان
+                      </span>
+                    }
+                    else
+                    {
+                      <span class="fw-bold">
+                        @Model.Summary.ShippingCost.ToString("N0")
+                        @Model.Summary.Currency.CurrencyTranslate()
+                      </span>
+                    }
+                  </td>
+                </tr>
+
+                <!-- Tax -->
+                <tr>
+                  <td class="text-muted ps-0">
+                    <i class="bi bi-bank me-1"></i>مالیات (۹٪):
+                  </td>
+                  <td class="text-end pe-0">
+                    <span class="fw-bold text-danger" id="summaryTax">
+                      + @Model.Summary.TaxAmount.ToString("N0")
+                      @Model.Summary.Currency.CurrencyTranslate()
+                    </span>
+                  </td>
+                </tr>
+
+                <!-- VAT -->
+                <tr>
+                  <td class="text-muted ps-0">
+                    <i class="bi bi-file-earmark-text me-1"></i>ارزش افزوده (۹٪):
+                  </td>
+                  <td class="text-end pe-0">
+                    <span class="fw-bold" id="summaryVat">
+                      + @Model.Summary.VatAmount.ToString("N0")
+                      @Model.Summary.Currency.CurrencyTranslate()
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- #endregion -->
+            <!-- #region Total -->
+            <div class="border-top pt-3 mt-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fs-6 fw-bold">مبلغ قابل پرداخت:</span>
+                <span class="fs-5 fw-bold text-primary" id="summaryTotal">
+                  @Model.Summary.Total.ToString("N0")
+                  @Model.Summary.Currency.CurrencyTranslate()
+                </span>
+              </div>
+            </div>
+            <!-- #endregion -->
+
+          </div>
+          <!-- #endregion -->
+          <!-- #region Summary Footer - Checkout -->
+          <div class="card-footer bg-light border-top py-3">
+            <div class="d-grid gap-2">
+              <button type="button"
+                      class="btn btn-success btn-lg checkout-btn"
+                      id="checkoutBtn">
+                <span id="checkoutText">
+                  <i class="bi bi-credit-card me-2"></i>
+                  تکمیل خرید و پرداخت
+                  <i class="bi bi-arrow-left ms-2"></i>
+                </span>
+                <span id="checkoutSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2"
+                        role="status"
+                        aria-hidden="true"></span>
+                  در حال انتقال...
+                </span>
+              </button>
+              <div class="text-center">
+                <small class="text-muted">
+                  <i class="bi bi-shield-lock me-1"></i>
+                  پرداخت امن با درگاه بانکی
+                </small>
+              </div>
+            </div>
+          </div>
+          <!-- #endregion -->
+
+        </div>
+        <!-- #endregion -->
+        <!-- #region Promo Card -->
+        <div class="card shadow-sm border-0 mt-4 overflow-hidden">
+          <div class="card-body text-white text-center py-4"
+               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="bg-white bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                 style="width: 64px; height: 64px;">
+              <i class="bi bi-gift fs-3"></i>
+            </div>
+            <h5 class="card-title text-white mb-2">تخفیف ویژه!</h5>
+            <p class="card-text mb-3 small opacity-75">
+              با خرید بیش از ۱۰ میلیون تومان، ۲۰٪ تخفیف بگیرید
+            </p>
+            <button class="btn btn-light btn-sm px-3">
+              <i class="bi bi-info-circle me-1"></i>
+              اطلاعات بیشتر
+            </button>
+          </div>
+        </div>
+        <!-- #endregion -->
+        <!-- #region Support Card -->
+        <div class="card shadow-sm border-0 mt-3">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                   style="width: 44px; height: 44px;">
+                <i class="bi bi-headset text-primary"></i>
+              </div>
+              <div>
+                <h6 class="mb-0">سوالی دارید؟</h6>
+                <small class="text-muted">پشتیبانی ۲۴ ساعته: ۰۲۱-۱۲۳۴۵۶۷۸</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- #endregion -->
+
+      </div>
+      <!-- #endregion -->
+
+    </div>
+    <!-- #endregion -->
+  }
+
+</div>
+<script>
+
+  // #region Utility Functions
+
+  function formatNumber(num) {
+    return Math.round(num).toLocaleString('fa-IR');
+  }
+
+  /** Currency label rendered from server */
+  const currencyLabel = '@Model.Summary.Currency.CurrencyTranslate()';
+
+  function setButtonLoading(btn, textEl, spinnerEl, isLoading) {
+    if (!btn || !textEl || !spinnerEl) return;
+    btn.disabled = isLoading;
+    textEl.classList.toggle('d-none', isLoading);
+    spinnerEl.classList.toggle('d-none', !isLoading);
+  }
+
+  function setSummaryLoading(isLoading) {
+    const overlay = document.getElementById('summaryOverlay');
+    if (!overlay) return;
+    overlay.classList.toggle('d-none', !isLoading);
+    overlay.classList.toggle('d-flex', isLoading);
+  }
+
+  function showCouponFeedback(message, type) {
+    const container = document.getElementById('couponFeedback');
+    const text = document.getElementById('couponFeedbackText');
+    if (!container || !text) return;
+
+    container.classList.remove('d-none');
+    text.textContent = message;
+    text.className = type === 'success'
+      ? 'text-success small'
+      : 'text-danger small';
+
+    setTimeout(() => container.classList.add('d-none'), 5000);
+  }
+
+  function updateSummary(s) {
+    document.getElementById('summarySubtotal').textContent =
+      `${formatNumber(s.subtotal)} ${currencyLabel}`;
+
+    const discountRow = document.getElementById('summaryDiscountRow');
+    if (s.discountAmount > 0) {
+      discountRow.classList.remove('d-none');
+      document.getElementById('summaryDiscountPercent').textContent =
+        parseFloat(s.discountPercentage.toFixed(2));
+      document.getElementById('summaryDiscountAmount').textContent =
+        `- ${formatNumber(s.discountAmount)} ${currencyLabel}`;
+    } else {
+      discountRow.classList.add('d-none');
+    }
+
+    const shippingEl = document.getElementById('summaryShipping');
+    if (s.shippingCost === 0) {
+      shippingEl.innerHTML =
+        `<span class="badge bg-success bg-opacity-10 text-success px-3">
+                  <i class="bi bi-check-circle me-1"></i>رایگان
+                </span>`;
+    } else {
+      shippingEl.innerHTML =
+        `<span class="fw-bold">${formatNumber(s.shippingCost)} ${currencyLabel}</span>`;
+    }
+
+    document.getElementById('summaryTax').textContent =
+      `+ ${formatNumber(s.taxAmount)} ${currencyLabel}`;
+    document.getElementById('summaryVat').textContent =
+      `+ ${formatNumber(s.vatAmount)} ${currencyLabel}`;
+
+    document.getElementById('summaryTotal').textContent =
+      `${formatNumber(s.total)} ${currencyLabel}`;
+  }
+
+  // #endregion
+
+  // #region Coupon Lock/Unlock (disable input & button when coupon is applied)
+
+  function setCouponLocked(locked) {
+    const input = document.getElementById('couponCodeInput');
+    const applyBtn = document.getElementById('applyCouponBtn');
+
+    if (input) {
+      input.disabled = locked;
+      input.classList.toggle('bg-light', locked);
+    }
+    if (applyBtn) {
+      applyBtn.disabled = locked;
+      applyBtn.classList.toggle('btn-primary', !locked);
+      applyBtn.classList.toggle('btn-secondary', locked);
+    }
+  }
+
+  // Lock on page load if coupon is already applied
+  @if (!string.IsNullOrWhiteSpace(Model.Summary.AppliedCouponCode))
+    {
+      <text>setCouponLocked(true); </text>
+  }
+
+    // #endregion
+
+    // #region Remove Item Handler (AJAX - no reload)
+
+    document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const itemId = btn.dataset.itemId;
+        const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+
+        // Fade out effect
+        if (row) row.style.opacity = '0.5';
+        btn.disabled = true;
+        setSummaryLoading(true);
+
+        try {
+          const response = await fetch(`/Cart/remove/${itemId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.isSuccess) {
+            // Remove the row with animation
+            if (row) {
+              row.style.transition = 'all 0.3s ease';
+              row.style.opacity = '0';
+              row.style.transform = 'translateX(20px)';
+              setTimeout(() => row.remove(), 300);
+            }
+
+            // Update item count badge
+            const badge = document.querySelector('.badge.bg-primary');
+            if (badge && result.data) {
+              if (result.data.itemsCount > 0) {
+                badge.innerHTML = `<i class="bi bi-box-seam me-1"></i>${result.data.itemsCount} مورد`;
+              }
+            }
+
+            // Update summary if returned
+            if (result.data?.summary) {
+              updateSummary(result.data.summary);
+            }
+
+            // If cart is now empty, reload to show empty state
+            if (result.data?.itemsCount === 0) {
+              setTimeout(() => location.reload(), 400);
+            }
+
+            if (typeof CartManager !== 'undefined') {
+              CartManager.showNotification('آیتم از سبد حذف شد', 'success');
+            }
+          } else {
+            // Restore row on failure
+            if (row) row.style.opacity = '1';
+            btn.disabled = false;
+            showCouponFeedback(result.message || 'خطا در حذف آیتم', 'error');
+          }
+        } catch (error) {
+          console.error('Remove item error:', error);
+          if (row) row.style.opacity = '1';
+          btn.disabled = false;
+          showCouponFeedback('خطا در ارتباط با سرور', 'error');
+        } finally {
+          setSummaryLoading(false);
+        }
+      });
+    });
+
+  // #endregion
+
+  // #region Clear Cart Handler (AJAX)
+
+  document.getElementById('clearCartBtn')?.addEventListener('click', async () => {
+    // Confirmation dialog
+    if (!confirm('آیا از خالی کردن سبد خرید مطمئن هستید؟')) return;
+
+    const btn = document.getElementById('clearCartBtn');
+    btn.disabled = true;
+    setSummaryLoading(true);
+
+    try {
+      const response = await fetch('/Cart/clear', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.isSuccess) {
+        if (typeof CartManager !== 'undefined') {
+          CartManager.showNotification('سبد خرید خالی شد', 'success');
+        }
+        // Reload to show empty state
+        setTimeout(() => location.reload(), 300);
+      } else {
+        showCouponFeedback(result.message || 'خطا در خالی کردن سبد', 'error');
+        btn.disabled = false;
+      }
+    } catch (error) {
+      console.error('Clear cart error:', error);
+      showCouponFeedback('خطا در ارتباط با سرور', 'error');
+      btn.disabled = false;
+    } finally {
+      setSummaryLoading(false);
+    }
+  });
+
+  // #endregion
+
+  // #region Apply Coupon Handler
+
+  document.getElementById('applyCouponBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('applyCouponBtn');
+    const textEl = document.getElementById('applyCouponText');
+    const spinnerEl = document.getElementById('applyCouponSpinner');
+    const input = document.getElementById('couponCodeInput');
+    const code = input.value.trim();
+
+    if (!code) {
+      showCouponFeedback('لطفاً کد تخفیف را وارد کنید', 'error');
+      input.focus();
+      return;
+    }
+
+    setButtonLoading(btn, textEl, spinnerEl, true);
+    setSummaryLoading(true);
+
+    try {
+      const response = await fetch('/Cart/apply-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ couponCode: code })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.isSuccess && result.data) {
+        showCouponFeedback('کد تخفیف با موفقیت اعمال شد', 'success');
+
+        if (typeof CartManager !== 'undefined') {
+          CartManager.showNotification('کد تخفیف اعمال شد', 'success');
+        }
+
+        updateSummary(result.data);
+
+        // Lock the input and apply button
+        setCouponLocked(true);
+
+        // Inject remove button if not present
+        if (!document.getElementById('removeCouponBtn')) {
+          const inputGroup = document.getElementById('couponInputGroup');
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'btn btn-outline-danger';
+          removeBtn.type = 'button';
+          removeBtn.id = 'removeCouponBtn';
+          removeBtn.innerHTML = `
+                    <span id="removeCouponText"><i class="bi bi-x-circle"></i></span>
+                    <span id="removeCouponSpinner" class="d-none">
+                      <span class="spinner-border spinner-border-sm"
+                            role="status" aria-hidden="true"></span>
+                    </span>`;
+          inputGroup.appendChild(removeBtn);
+          bindRemoveCoupon();
+        }
+      } else {
+        const errorMsg = result.message || 'کد تخفیف نامعتبر است';
+        showCouponFeedback(errorMsg, 'error');
+
+        if (typeof CartManager !== 'undefined') {
+          CartManager.showNotification(errorMsg, 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Apply coupon error:', error);
+      showCouponFeedback('خطا در ارتباط با سرور', 'error');
+    } finally {
+      setButtonLoading(btn, textEl, spinnerEl, false);
+      setSummaryLoading(false);
+    }
+  });
+
+  // #endregion
+
+  // #region Remove Coupon Handler
+
+  function bindRemoveCoupon() {
+    document.getElementById('removeCouponBtn')?.addEventListener('click', async () => {
+      const btn = document.getElementById('removeCouponBtn');
+      const textEl = document.getElementById('removeCouponText');
+      const spinnerEl = document.getElementById('removeCouponSpinner');
+
+      setButtonLoading(btn, textEl, spinnerEl, true);
+      setSummaryLoading(true);
+
+      try {
+        const response = await fetch('/Cart/remove-coupon', { method: 'DELETE' });
+        const result = await response.json();
+
+        if (response.ok && result.isSuccess && result.data) {
+          showCouponFeedback('کد تخفیف حذف شد', 'success');
+
+          if (typeof CartManager !== 'undefined') {
+            CartManager.showNotification('کد تخفیف حذف شد', 'success');
+          }
+
+          document.getElementById('couponCodeInput').value = '';
+          updateSummary(result.data);
+
+          // Unlock input and apply button
+          setCouponLocked(false);
+
+          // Remove the remove-button itself
+          btn.remove();
+        } else {
+          showCouponFeedback(result.message || 'خطا در حذف کد تخفیف', 'error');
+        }
+      } catch (error) {
+        console.error('Remove coupon error:', error);
+        showCouponFeedback('خطا در ارتباط با سرور', 'error');
+      } finally {
+        if (document.getElementById('removeCouponBtn')) {
+          setButtonLoading(btn, textEl, spinnerEl, false);
+        }
+        setSummaryLoading(false);
+      }
+    });
+  }
+
+  bindRemoveCoupon();
+
+  // #endregion
+  // #region Checkout Button Handler
+
+  document.getElementById('checkoutBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('checkoutBtn');
+    const textEl = document.getElementById('checkoutText');
+    const spinnerEl = document.getElementById('checkoutSpinner');
+
+    setButtonLoading(btn, textEl, spinnerEl, true);
+
+    try {
+      // Simply redirect to checkout page
+      window.location.href = '/Checkout';
+    } catch (error) {
+      console.error('Checkout redirect error:', error);
+      setButtonLoading(btn, textEl, spinnerEl, false);
+
+      if (typeof CartManager !== 'undefined') {
+        CartManager.showNotification('خطا در انتقال به صفحه پرداخت', 'error');
+      }
+    }
+  });
+
+  // #endregion
+
+  // #region Keyboard Support
+
+  document.getElementById('couponCodeInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('applyCouponBtn')?.click();
+    }
+  });
+
+  // #endregion
+
+  // #region Bootstrap Tooltips Init
+
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+  });
+
+  // #endregion
+
+</script>
+
+

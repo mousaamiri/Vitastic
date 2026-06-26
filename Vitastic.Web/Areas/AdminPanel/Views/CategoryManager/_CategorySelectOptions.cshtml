@@ -1,0 +1,14 @@
+@model List<Vitastic.Web.Models.DTOs.Category.CategoryDetailDto>
+
+@if (Model.Any())
+{
+  @foreach (var category in Model)
+  {
+    <option value="@category.Id">@category.Name</option>
+        
+    @if (category.SubCategories.Any())
+    {
+      @await Html.PartialAsync("_CategorySelectOptionsNested", new { Categories = category.SubCategories, Level = 1 })
+    }
+  }
+}

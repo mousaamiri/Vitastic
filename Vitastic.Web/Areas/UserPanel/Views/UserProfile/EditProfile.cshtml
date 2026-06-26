@@ -1,0 +1,371 @@
+@model Vitastic.Web.Models.DTOs.Auth.UserDetailDto
+
+@{
+  ViewBag.Title = "اطلاعات حساب کاربری";
+  var fullName = $"{Model.FirstName?.Trim()} {Model.LastName?.Trim()}".Trim();
+}
+
+@* ============================== Account Info Card ============================== *@
+<div class="row justify-content-center">
+  <div class="col-xl-12 col-lg-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">اطلاعات حساب کاربری</h4>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+
+          @* ---- Username (read-only) ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">نام کاربری</small>
+              <span class="fw-semibold">
+                @(string.IsNullOrEmpty(Model.UserName?.Trim()) ? "ثبت نشده" : Model.UserName)
+              </span>
+            </div>
+            <span class="badge bg-secondary bg-opacity-10 text-light fw-medium">غیرقابل تغییر</span>
+          </li>
+
+          @* ---- Full Name (editable) ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">نام و نام خانوادگی</small>
+              <span class="fw-semibold" id="display-fullname">
+                @(string.IsNullOrEmpty(fullName) ? "ثبت نشده" : fullName)
+              </span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modalEditName">
+              <i class="fa-solid fa-pencil me-1"></i>
+              <span class="fw-semibold">ویرایش</span>
+            </button>
+          </li>
+
+          @* ---- Email (editable) ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">ایمیل</small>
+              <span class="fw-semibold" id="display-email">
+                @(string.IsNullOrEmpty(Model.Email?.Trim()) ? "ثبت نشده" : Model.Email)
+              </span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modalEditEmail">
+              <i class="fa-solid fa-pencil me-1"></i>
+              <span class="fw-semibold">ویرایش</span>
+            </button>
+          </li>
+
+          @* ---- Phone (editable) ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">شماره تلفن</small>
+              <span class="fw-semibold" id="display-phone">
+                @(string.IsNullOrEmpty(Model.PhoneNumber?.Trim()) ? "ثبت نشده" : Model.PhoneNumber)
+              </span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal" data-bs-target="#modalEditPhone">
+              <i class="fa-solid fa-pencil me-1"></i>
+              <span class="fw-semibold">ویرایش</span>
+            </button>
+          </li>
+
+          @* ---- Wallet Balance (read-only) ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">موجودی کیف پول</small>
+              <span class="fw-semibold text-success">
+                @($"{Model.WalletBalance:N0} تومان")
+              </span>
+            </div>
+            <a asp-controller="Wallet" asp-action="Index"
+               class="btn btn-sm btn-outline-success">
+              <i class="fa-solid fa-wallet me-1"></i>
+              <span class="fw-semibold">مدیریت</span>
+            </a>
+          </li>
+
+          @* ---- Password ---- *@
+          <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+            <div>
+              <small class="text-muted d-block mb-1">رمز عبور</small>
+              <span class="fw-semibold">•••••••</span>
+            </div>
+            <a asp-controller="UserProfile" asp-action="ChangePassword"
+               class="btn btn-sm btn-outline-warning">
+              <i class="fa-solid fa-key me-1"></i>
+              <span class="fw-semibold">تغییر رمز</span>
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+@* ============================== Modal: Edit Name ============================== *@
+<div class="modal fade" id="modalEditName" tabindex="-1" aria-labelledby="modalEditNameLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditNameLabel">ویرایش نام و نام خانوادگی</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+      </div>
+      <form id="formEditName">
+        <div class="modal-body">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="inputFirstName"
+                   placeholder="نام" value="@Model.FirstName" required>
+            <label for="inputFirstName">نام</label>
+          </div>
+          <div class="form-floating">
+            <input type="text" class="form-control" id="inputLastName"
+                   placeholder="نام خانوادگی" value="@Model.LastName" required>
+            <label for="inputLastName">نام خانوادگی</label>
+          </div>
+          <div class="alert alert-danger mt-3 d-none" id="errorEditName"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveName">
+            <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerName"></span>
+            ذخیره
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* ============================== Modal: Edit Email ============================== *@
+<div class="modal fade" id="modalEditEmail" tabindex="-1" aria-labelledby="modalEditEmailLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditEmailLabel">ویرایش ایمیل</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+      </div>
+      <form id="formEditEmail">
+        <div class="modal-body">
+          <div class="form-floating">
+            <input type="email" class="form-control" id="inputEmail"
+                   placeholder="example@email.com" value="@Model.Email" required>
+            <label for="inputEmail">ایمیل</label>
+          </div>
+          <div class="alert alert-danger mt-3 d-none" id="errorEditEmail"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btnSaveEmail">
+            <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerEmail"></span>
+            ذخیره
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* ============================== Modal: Edit Phone ============================== *@
+<div class="modal fade" id="modalEditPhone" tabindex="-1" aria-labelledby="modalEditPhoneLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditPhoneLabel">ویرایش شماره تلفن</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
+      </div>
+      <form id="formEditPhone">
+        <div class="modal-body">
+          <div class="form-floating">
+            <input type="tel" class="form-control" id="inputPhone" dir="ltr"
+                   placeholder="09xxxxxxxxx" value="@Model.PhoneNumber"
+                   pattern="09[0-9]{9}" maxlength="11" required>
+            <label for="inputPhone">شماره تلفن</label>
+          </div>
+          <div class="alert alert-danger mt-3 d-none" id="errorEditPhone"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btnSavePhone">
+            <span class="spinner-border spinner-border-sm d-none me-1" id="spinnerPhone"></span>
+            ذخیره
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* ============================== AJAX Scripts ============================== *@
+@section AdditionalScript
+{
+  <script>
+   
+    const urls = {
+      editName: '@Url.Action("EditUserFullName", "UserProfile", new { area = "UserPanel" })',
+      editEmail: '@Url.Action("EditUserEmail", "UserProfile", new { area = "UserPanel" })',
+      editPhone: '@Url.Action("EditUserPhoneNumber", "UserProfile", new { area = "UserPanel" })'
+    };
+
+    function setLoading(spinnerId, btnId, loading) {
+      document.getElementById(spinnerId).classList.toggle('d-none', !loading);
+      document.getElementById(btnId).disabled = loading;
+    }
+
+    function showError(errorId, message) {
+      const el = document.getElementById(errorId);
+      el.textContent = message;
+      el.classList.remove('d-none');
+    }
+
+    function hideError(errorId) {
+      document.getElementById(errorId).classList.add('d-none');
+    }
+
+    // Extract error message from server response (handles JSON and non-JSON)
+    async function extractError(res, fallback) {
+      try {
+        const text = await res.text();
+        const data = JSON.parse(text);
+        // Support: { message }, { errors: {...} }, { title } (ProblemDetails)
+        if (data.message) return data.message;
+        if (data.errors) {
+          const msgs = Object.values(data.errors).flat();
+          return msgs.join(' | ') || fallback;
+        }
+        if (data.title) return data.title;
+        return fallback;
+      } catch {
+        // Response was not JSON
+        return fallback;
+      }
+    }
+
+    // Parse JSON response and check both HTTP status and success field
+    async function handleResponse(res, fallbackError) {
+      if (!res.ok) {
+        const msg = await extractError(res, fallbackError);
+        return { success: false, message: msg };
+      }
+
+      try {
+        const text = await res.text();
+        const data = JSON.parse(text);
+
+        // Even if HTTP 200, server might return success: false with a message
+        if (data.success === false) {
+          return { success: false, message: data.message || fallbackError };
+        }
+
+        return { success: true, message: data.message || '' };
+      } catch {
+        // Response was 2xx but not valid JSON — treat as success
+        return { success: true, message: '' };
+      }
+    }
+
+    document.getElementById('formEditName').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      hideError('errorEditName');
+      setLoading('spinnerName', 'btnSaveName', true);
+
+      try {
+        debugger
+        const res = await fetch(urls.editName, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: document.getElementById('inputFirstName').value.trim(),
+            lastName: document.getElementById('inputLastName').value.trim()
+          })
+        });
+
+        const result = await handleResponse(res, 'خطا در بروزرسانی نام');
+
+        if (!result.success) {
+          showError('errorEditName', result.message);
+          return;
+        }
+
+        // Update displayed value
+        const first = document.getElementById('inputFirstName').value.trim();
+        const last = document.getElementById('inputLastName').value.trim();
+        document.getElementById('display-fullname').textContent = `${first} ${last}`.trim() || 'ثبت نشده';
+        bootstrap.Modal.getInstance(document.getElementById('modalEditName')).hide();
+
+      } catch {
+        showError('errorEditName', 'خطا در ارتباط با سرور');
+      } finally {
+        setLoading('spinnerName', 'btnSaveName', false);
+      }
+    });
+
+    document.getElementById('formEditEmail').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      hideError('errorEditEmail');
+      setLoading('spinnerEmail', 'btnSaveEmail', true);
+
+      try {
+        const res = await fetch(urls.editEmail, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            newEmail: document.getElementById('inputEmail').value.trim()
+          })
+        });
+
+        const result = await handleResponse(res, 'خطا در بروزرسانی ایمیل');
+
+        if (!result.success) {
+          showError('errorEditEmail', result.message);
+          return;
+        }
+
+        // Update displayed value
+        document.getElementById('display-email').textContent =
+          document.getElementById('inputEmail').value.trim() || 'ثبت نشده';
+        bootstrap.Modal.getInstance(document.getElementById('modalEditEmail')).hide();
+
+      } catch {
+        showError('errorEditEmail', 'خطا در ارتباط با سرور');
+      } finally {
+        setLoading('spinnerEmail', 'btnSaveEmail', false);
+      }
+    });
+
+    document.getElementById('formEditPhone').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      hideError('errorEditPhone');
+      setLoading('spinnerPhone', 'btnSavePhone', true);
+
+      try {
+        const res = await fetch(urls.editPhone, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phoneNumber: document.getElementById('inputPhone').value.trim()
+          })
+        });
+
+        const result = await handleResponse(res, 'خطا در بروزرسانی شماره تلفن');
+
+        if (!result.success) {
+          showError('errorEditPhone', result.message);
+          return;
+        }
+
+        // Update displayed value
+        document.getElementById('display-phone').textContent =
+          document.getElementById('inputPhone').value.trim() || 'ثبت نشده';
+        bootstrap.Modal.getInstance(document.getElementById('modalEditPhone')).hide();
+
+      } catch {
+        showError('errorEditPhone', 'خطا در ارتباط با سرور');
+      } finally {
+        setLoading('spinnerPhone', 'btnSavePhone', false);
+      }
+    });
+  </script>
+}

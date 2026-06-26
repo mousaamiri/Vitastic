@@ -1,0 +1,368 @@
+@using Vitastic.Web.Models.DTOs.Disocunt
+@model Vitastic.Web.Models.ViewModels.UpsertDiscountViewModel
+@{
+  Layout = "";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+  <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">بستن</button>
+}
+else if (Model is null)
+{
+  <div class="alert alert-danger">خطایی در دریافت اطلاعات رخ داده است</div>
+  <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">بستن</button>
+}
+else
+{
+  <div class="modal-header bg-primary text-white">
+    <h5 class="modal-title">
+      <i class="fas fa-tag me-2"></i>
+      @(Model.DiscountId.HasValue ? "ویرایش کد تخفیف" : "افزودن کد تخفیف جدید")
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  </div>
+
+  <div class="modal-body">
+    <form id="upsertDiscountForm" method="post" asp-action="Upsert" asp-controller="DiscountManager" asp-area="AdminPanel">
+      @Html.AntiForgeryToken()
+      <input type="hidden" asp-for="DiscountId" />
+
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="form-floating">
+            <input type="text" asp-for="Discount.Title" class="form-control" id="discountTitle" placeholder="عنوان کد تخفیف" required>
+            <label for="discountCode">
+              <i class="fas fa-barcode me-1"></i>
+             عنوان کد تخفیف
+            </label>
+          </div>
+        </div>
+        <!-- کد تخفیف -->
+        <div class="col-12">
+          <div class="form-floating">
+            <input type="text" asp-for="Discount.Code" class="form-control" id="discountCode" placeholder="کد تخفیف" required>
+            <label for="discountCode">
+              <i class="fas fa-barcode me-1"></i>
+              کد تخفیف (فقط انگلیسی و بدون فاصله)
+            </label>
+          </div>
+        </div>
+
+        <!-- نوع کد تخفیف -->
+        <div class="col-12">
+          <label class="form-label fw-bold">
+            <i class="fas fa-percent me-1"></i>
+            نوع کد تخفیف
+          </label>
+          <div class="btn-group w-100 " role="group" style="direction: ltr;">
+            <input type="radio" asp-for="Discount.Type" value="Percentage" readonl="@(Model.DiscountId.HasValue)" class="btn-check" id="typePercentage" checked>
+            <label class="btn btn-outline-primary" for="typePercentage">
+              <i class="fas fa-percentage"></i> درصدی
+            </label>
+
+            <input type="radio" asp-for="Discount.Type" readonly="@(Model.DiscountId.HasValue)" value="FixedAmount" class="btn-check" id="typeFixed">
+            <label class="btn btn-outline-primary" for="typeFixed">
+              <i class="fas fa-dollar-sign"></i> مقدار ثابت
+            </label>
+          </div>
+        </div>
+
+        <!-- مقدار -->
+        <div class="col-12">
+          <div class="form-floating">
+            <input type="number" asp-for="Discount.Value" class="form-control" id="discountValue" placeholder="مقدار" required min="0" step="0.01">
+            <label for="discountValue">
+              <i class="fas fa-coins me-1"></i>
+              <span id="valueLabel">مقدار (درصد: 0 تا 100)</span>
+            </label>
+            <div class="invalid-feedback" id="valueFeedback"></div>
+          </div>
+        </div>
+
+        <!-- محدوده تاریخ -->
+        <div class="col-12">
+          <label class="form-label fw-bold">
+            <i class="fas fa-calendar-alt me-1"></i>
+            محدوده تاریخ
+          </label>
+          <input class="form-control" type="text" id="dateRangePicker" name="daterange" placeholder="انتخاب بازه زمانی" required>
+          <input type="hidden" asp-for="Discount.StartDate" id="startDateHidden"/>
+          <input type="hidden" asp-for="Discount.EndDate" id="endDateHidden"/>
+          <div class="invalid-feedback" id="dateFeedback"></div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      <i class="fas fa-times me-1"></i> بستن
+    </button>
+    <button type="button" class="btn btn-primary" onclick="submitUpsertForm(event)">
+      <i class="fas fa-save me-1"></i> ذخیره
+    </button>
+  </div>
+}
+
+<script>
+  $(function() {
+    const today = moment().startOf('day');
+    const isEditMode = @((bool)Model?.DiscountId.HasValue ? "true" : "false");
+
+    // تنظیمات پایه Date Range Picker
+    let pickerOptions = {
+      locale: {
+        format: 'YYYY/MM/DD',
+        separator: ' تا ',
+        applyLabel: 'اعمال',
+        cancelLabel: 'لغو',
+        fromLabel: 'از',
+        toLabel: 'تا',
+        customRangeLabel: 'سفارشی',
+        daysOfWeek: ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'],
+        monthNames: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'],
+        firstDay: 6
+      },
+      startDate: today,
+      endDate: moment().add(7, 'days')
+    };
+
+    // در حالت افزودن، minDate را روی امروز تنظیم کن
+    if (!isEditMode) {
+      pickerOptions.minDate = today;
+    }
+
+    @if (Model?.Discount.StartDate != null && Model?.Discount.EndDate != null)
+    {
+      <text>
+      // در حالت ویرایش، تاریخ‌های موجود را بارگذاری کن
+      const editStartDate = moment('@Model.Discount.StartDate.ToString("yyyy-MM-dd")');
+      const editEndDate = moment('@Model.Discount.EndDate.ToString("yyyy-MM-dd")');
+
+      pickerOptions.startDate = editStartDate;
+      pickerOptions.endDate = editEndDate;
+
+      // اگر تاریخ شروع از امروز قبل‌تر است، minDate را روی آن تنظیم کن
+      if (editStartDate.isBefore(today)) {
+        pickerOptions.minDate = editStartDate;
+      } else {
+        pickerOptions.minDate = today;
+      }
+      </text>
+    }
+
+    // ایجاد Date Range Picker
+    $('#dateRangePicker').daterangepicker(pickerOptions, function(start, end) {
+      if (validateDates(start, end)) {
+        $('#startDateHidden').val(start.format('YYYY-MM-DD'));
+        $('#endDateHidden').val(end.format('YYYY-MM-DD'));
+      }
+    });
+
+    // مقداردهی اولیه hidden fields
+    if (!isEditMode) {
+      $('#startDateHidden').val(today.format('YYYY-MM-DD'));
+      $('#endDateHidden').val(moment().add(7, 'days').format('YYYY-MM-DD'));
+    }
+    @if (Model?.Discount.StartDate != null && Model?.Discount.EndDate != null)
+    {
+      <text>
+       {
+        $('#startDateHidden').val('@Model.Discount.StartDate.ToString("yyyy-MM-dd")');
+        $('#endDateHidden').val('@Model.Discount.EndDate.ToString("yyyy-MM-dd")');
+      }
+      </text>
+    }
+
+    // تابع اعتبارسنجی تاریخ‌ها
+    function validateDates(start, end) {
+      const dateInput = $('#dateRangePicker');
+      const feedback = $('#dateFeedback');
+
+      // در حالت افزودن، تاریخ شروع نباید قبل از امروز باشد
+      if (!isEditMode && start.isBefore(today)) {
+        dateInput.addClass('is-invalid');
+        feedback.text('تاریخ شروع نمی‌تواند قبل از امروز باشد');
+        feedback.show();
+        return false;
+      }
+
+      // تاریخ پایان باید بعد از تاریخ شروع باشد
+      if (end.isBefore(start)) {
+        dateInput.addClass('is-invalid');
+        feedback.text('تاریخ پایان باید بعد از تاریخ شروع باشد');
+        feedback.show();
+        return false;
+      }
+
+      if (end.isSame(start)) {
+        dateInput.addClass('is-invalid');
+        feedback.text('تاریخ پایان باید از تاریخ شروع جلوتر باشد');
+        feedback.show();
+        return false;
+      }
+
+      dateInput.removeClass('is-invalid');
+      feedback.hide();
+      return true;
+    }
+
+    // مدیریت تغییر نوع تخفیف
+    $('input[name="Discount.Type"]').on('change', function() {
+      updateValueConstraints();
+    });
+
+    // اعمال محدودیت‌ها در بارگذاری اولیه
+    updateValueConstraints();
+
+    function updateValueConstraints() {
+      const discountType = $('input[name="Discount.Type"]:checked').val();
+      const valueInput = $('#discountValue');
+      const valueLabel = $('#valueLabel');
+
+      if (discountType === 'Percentage') {
+        valueInput.attr('min', '0');
+        valueInput.attr('max', '100');
+        valueLabel.text('مقدار (درصد: 0 تا 100)');
+      } else {
+        valueInput.attr('min', '0');
+        valueInput.removeAttr('max');
+        valueLabel.text('مقدار (تومان)');
+      }
+
+      validateValue();
+    }
+
+    // اعتبارسنجی در هنگام تغییر مقدار
+    $('#discountValue').on('input', function() {
+      validateValue();
+    });
+
+    function validateValue() {
+      const discountType = $('input[name="Discount.Type"]:checked').val();
+      const valueInput = $('#discountValue');
+      const value = parseFloat(valueInput.val());
+      const feedback = $('#valueFeedback');
+
+      if (isNaN(value)) {
+        valueInput.removeClass('is-invalid');
+        feedback.text('');
+        return true;
+      }
+
+      if (discountType === 'Percentage') {
+        if (value <= 0 || value > 100) {
+          valueInput.addClass('is-invalid');
+          feedback.text('مقدار درصد باید بین 0 تا 100 باشد (بیشتر از صفر)');
+          return false;
+        }
+      } else {
+        if (value <= 0) {
+          valueInput.addClass('is-invalid');
+          feedback.text('مقدار باید بیشتر از صفر باشد');
+          return false;
+        }
+      }
+
+      valueInput.removeClass('is-invalid');
+      feedback.text('');
+      return true;
+    }
+  });
+
+  function submitUpsertForm(event) {
+    const form = document.getElementById("upsertDiscountForm");
+    if (!form) {
+      console.error("Form not found");
+      return;
+    }
+
+    // اعتبارسنجی مقدار
+    const discountType = $('input[name="Discount.Type"]:checked').val();
+    const value = parseFloat($('#discountValue').val());
+
+    if (isNaN(value)) {
+      alert('لطفاً مقدار را وارد کنید');
+      return;
+    }
+
+    if (discountType === 'Percentage') {
+      if (value <= 0 || value > 100) {
+        alert('مقدار درصد باید بین 0 تا 100 باشد (بیشتر از صفر)');
+        return;
+      }
+    } else {
+      if (value <= 0) {
+        alert('مقدار باید بیشتر از صفر باشد');
+        return;
+      }
+    }
+
+    // اعتبارسنجی تاریخ‌ها
+    const startDate = $('#startDateHidden').val();
+    const endDate = $('#endDateHidden').val();
+
+    if (!startDate || !endDate) {
+      alert('لطفاً بازه زمانی را انتخاب کنید');
+      return;
+    }
+
+    const start = moment(startDate);
+    const end = moment(endDate);
+    const today = moment().startOf('day');
+    const isEditMode = @((bool)Model?.DiscountId.HasValue ? "true" : "false");
+
+    if (!isEditMode && start.isBefore(today)) {
+      alert('تاریخ شروع نمی‌تواند قبل از امروز باشد');
+      return;
+    }
+
+    if (end.isSameOrBefore(start)) {
+      alert('تاریخ پایان باید از تاریخ شروع جلوتر باشد');
+      return;
+    }
+
+    const formData = new FormData(form);
+    const submitButton = event.target;
+
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> در حال ذخیره...';
+    debugger
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().catch(() => null).then(data => {
+          throw new Error(data?.message || `خطای سرور: ${response.status}`);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('mainModal'));
+        if (modal) modal.hide();
+
+        alert(data.message || 'عملیات با موفقیت انجام شد');
+        location.reload();
+      } else {
+        alert(data.message || 'خطایی رخ داده است');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert(error.message || 'خطا در ارسال اطلاعات');
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.innerHTML = '<i class="fas fa-save me-1"></i> ذخیره';
+    });
+  }
+</script>

@@ -1,0 +1,79 @@
+@model PaginatedData<CategoryViewModel>
+
+<nav id="navmenu" class="navmenu">
+  <ul>
+    <li>
+      <a href="@Url.Action("Index", "Course")">
+        <i class="bi bi-shop-window me-2"></i>
+        <span>فروشگاه</span>
+      </a>
+    </li>
+    @foreach (var cat in Model.Items.Where(x => x.ParentCategoryId == null))
+    {
+      <li class="@(cat.SubCategories.Any() ? "dropdown" : "")">
+        <a href="@Url.Action("Index", "Courses", new { CategoryId  = cat.Id })">
+          <i class="@cat.Icon me-2"></i>
+          <span>@cat.Name</span>
+          @* @if (cat.CourseCount > 0) *@
+          @* { *@
+          @*     <span class="badge">@cat.CourseCount</span> *@
+          @* } *@
+        </a>
+
+        @if (cat.SubCategories.Any())
+        {
+          <ul>
+            @foreach (var child in cat.SubCategories)
+            {
+              <li class="@(child.SubCategories.Any() ? "dropdown" : "")">
+                <a href="@Url.Action("Index", "Courses", new { CategoryId  = child.Id })">
+                  <span>@child.Name</span>
+                  @* @if (child.CourseCount > 0) *@
+                  @* { *@
+                  @*     <span class="badge">@child.CourseCount</span> *@
+                  @* } *@
+                </a>
+
+                @if (child.SubCategories.Any())
+                {
+                  <ul>
+                    @foreach (var subChild in child.SubCategories)
+                    {
+                      <li>
+                        <a href="@Url.Action("Index", "Courses", new { CategoryId  = subChild.Id })">
+                          @subChild.Name
+                          @* @if (subChild.CourseCount > 0) *@
+                          @* { *@
+                          @*     <span class="badge">@subChild.CourseCount</span> *@
+                          @* } *@
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </li>
+    }
+  </ul><i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+</nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('#navmenu li.dropdown').forEach(li => {
+        const aTag = li.querySelector(':scope > a');
+        if (aTag && !aTag.querySelector('.toggle-dropdown')) {
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-chevron-down toggle-dropdown';
+            aTag.appendChild(icon);
+
+            icon.addEventListener('click', function(e) {
+                e.preventDefault();
+                li.classList.toggle('active');
+            });
+        }
+    });
+});
+</script>

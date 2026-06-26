@@ -1,0 +1,109 @@
+@model Vitastic.Web.Models.ViewModels.CourseListViewModel
+
+@if (Model.Courses.TotalPages > 1)
+{
+  <div class="pagination-wrapper aos-init aos-animate" data-aos="fade-up" data-aos-delay="300">
+    <ul class="pagination justify-content-center">
+
+                @* Previous *@
+                <li class="page-item @(!Model.Courses.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@GetPageUrl(Model.Filter.PageNumber - 1)"
+                       @(!Model.Courses.HasPreviousPage ? "tabindex=-1 aria-disabled=true" : "")>
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+
+                @{
+                    var startPage = Math.Max(1, Model.Filter.PageNumber - 2);
+                    var endPage = Math.Min(Model.Courses.TotalPages, Model.Filter.PageNumber + 2);
+                }
+
+                @* First page *@
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(1)">1</a>
+                    </li>
+
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @* Page Numbers *@
+                @for (var i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == Model.Filter.PageNumber ? "active" : "")">
+                        <a class="page-link" href="@GetPageUrl(i)">@i</a>
+                    </li>
+                }
+
+                @* Last page *@
+                @if (endPage < Model.Courses.TotalPages)
+                {
+                    @if (endPage < Model.Courses.TotalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+
+                    <li class="page-item">
+                        <a class="page-link" href="@GetPageUrl(Model.Courses.TotalPages)">
+                            @Model.Courses.TotalPages
+                        </a>
+                    </li>
+                }
+
+                @* Next *@
+                <li class="page-item @(!Model.Courses.HasNextPage ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@GetPageUrl(Model.Filter.PageNumber + 1)"
+                       @(!Model.Courses.HasNextPage ? "tabindex=-1 aria-disabled=true" : "")>
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+
+            </ul>
+        
+    </div>
+}
+
+
+
+@functions {
+
+    // Generate pagination url with current filters
+    string GetPageUrl(int page)
+    {
+        var filter = Model.Filter;
+
+        var routeValues = new Dictionary<string, string?>
+        {
+            ["PageNumber"] = page.ToString(),
+            ["PageSize"] = filter.PageSize.ToString(),
+            ["Search"] = filter.SearchTerm,
+            ["CategoryId"] = filter.CategoryId?.ToString(),
+            ["Level"] = filter.Level.ToString(),
+            ["SortBy"] = filter.SortBy.ToString(),
+            ["MinPrice"] = filter.MinPrice?.ToString(),
+            ["MaxPrice"] = filter.MaxPrice?.ToString(),
+            ["IsFree"] = filter.IsFree?.ToString(),
+            ["HasCertificate"] = filter.HasCertificate?.ToString()
+        };
+
+        // Remove null values
+        var filtered = routeValues
+            .Where(kv => kv.Value != null)
+            .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+        var queryString = string.Join("&", filtered.Select(kv => $"{kv.Key}={kv.Value}"));
+
+        return $"/courses?{queryString}";
+    }
+
+}

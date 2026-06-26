@@ -1,0 +1,440 @@
+@model PaginatedData<Vitastic.Web.Models.DTOs.Tag.TagDto>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+  @if (Model == null || Model.Items == null)
+  {
+    <div class="card">
+      <div class="card-body text-center py-5">
+        <div class="mb-4">
+          <i class="mdi mdi-alert-circle-outline text-danger" style="font-size: 64px;"></i>
+        </div>
+        <h4 class="text-danger mb-3">خطا در بارگذاری اطلاعات</h4>
+        <p class="text-muted mb-4">امکان دریافت اطلاعات برچسب‌ها وجود ندارد. لطفاً دوباره تلاش کنید.</p>
+        <button onclick="location.reload()" class="btn btn-primary">
+          <i class="mdi mdi-refresh me-1"></i>
+          تلاش مجدد
+        </button>
+      </div>
+    </div>
+  }
+  else
+  {
+
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="head-label">
+          <h5 class="card-title mb-0">
+            <i class="mdi mdi-tag-multiple me-2"></i>
+            مدیریت برچسب‌ها
+          </h5>
+          <small class="text-muted">تعداد کل: @Model.TotalCount برچسب</small>
+        </div>
+        <div class="dt-action-buttons">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
+            <i class="mdi mdi-plus me-1"></i>
+            <span class="d-none d-sm-inline-block">افزودن برچسب</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form method="get" id="filterForm">
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <div class="row g-3 align-items-end">
+                <div class="col-lg-2 col-md-3 col-sm-6">
+                  <label class="form-label fw-semibold text-muted mb-2" for="pageSizeSelecect">
+                    <i class="mdi mdi-format-list-numbered text-primary me-1"></i>
+                    تعداد در صفحه
+                  </label>
+                  <select name="take" class="default-select form-control wide mb-3" onchange="this.form.submit()" id="pageSizeSelecect">
+                    @foreach (var size in new[] { 10, 25, 50, 100 })
+                    {
+                      <option value="@size" selected="@(Model.PageSize == size)">@size مورد</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="col-lg-10 col-md-9 col-sm-6">
+                  <label class="form-label fw-semibold text-muted mb-2">
+                    <i class="mdi mdi-magnify text-primary me-1"></i>
+                    جستجو
+                  </label>
+                  <div class="input-group shadow-sm">
+                    <input type="search"
+                           name="searchQuery"
+                           value="@Context.Request.Query["searchQuery"]"
+                           class="form-control border-end-0"
+                           placeholder="نام برچسب را جستجو کنید..."
+                           style="border-left: none;" />
+                    <button type="submit" class="btn btn-primary px-4">
+                      <i class="mdi mdi-magnify me-1"></i>
+                      جستجو
+                    </button>
+
+                  </div>
+                  @if (!string.IsNullOrEmpty(Context.Request.Query["searchQuery"]))
+                  {
+                    <small class="text-muted d-block mt-2">
+                      <i class="mdi mdi-information-outline"></i>
+                      در حال نمایش نتایج برای: <span class="fw-bold text-primary">"@Context.Request.Query["searchQuery"]"</span>
+                    </small>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" name="pageNumber" value="@Model.PageNumber" />
+        </form>
+
+        <style>
+          #filterForm .form-select:focus,
+          #filterForm .form-control:focus {
+            border-color: #5b73e8;
+            box-shadow: 0 0 0 0.2rem rgba(91, 115, 232, 0.15);
+          }
+
+          #filterForm .input-group .form-control {
+            border-right: 1px solid #ced4da;
+          }
+
+          #filterForm .card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+          }
+
+          #filterForm .btn-primary {
+            background: linear-gradient(135deg, #5b73e8 0%, #4a5fd8 100%);
+            border: none;
+            transition: all 0.3s ease;
+          }
+
+            #filterForm .btn-primary:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(91, 115, 232, 0.4);
+            }
+
+          #filterForm .btn-outline-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+          }
+        </style>
+
+        <!-- جدول -->
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th>نام برچسب</th>
+                <th style="width: 120px;" class="text-center">تعداد استفاده</th>
+                <th style="width: 100px;" class="text-center">وضعیت</th>
+                <th style="width: 120px;" class="text-center">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (Model.Items.Any())
+              {
+                int rowNumber = (Model.PageNumber - 1) * Model.PageSize + 1;
+                foreach (var tag in Model.Items)
+                {
+                  <tr>
+                    <td class="text-muted">@rowNumber</td>
+                    <td>
+                      <strong>@tag.Name</strong>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge bg-label-info rounded-pill">@tag.UsageCount</span>
+                    </td>
+                    <td class="text-center">
+                      @if (tag.IsActive)
+                      {
+                        <span class="badge bg-label-success">فعال</span>
+                      }
+                      else
+                      {
+                        <span class="badge bg-label-secondary">غیرفعال</span>
+                      }
+                    </td>
+                    <td class="text-center">
+                      <div class="d-inline-flex gap-1">
+                        <button type="button" class="btn btn-sm btn-icon btn-warning"
+                                onclick="editTag('@tag.Id', '@Html.Raw(tag.Name)', @tag.IsActive.ToString().ToLower())"
+                                data-bs-toggle="tooltip" title="ویرایش">
+                          <i class="mdi mdi-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-icon btn-danger"
+                                onclick="deleteTag('@tag.Id', '@Html.Raw(tag.Name)')"
+                                data-bs-toggle="tooltip" title="حذف">
+                          <i class="mdi mdi-delete"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  rowNumber++;
+                }
+              }
+              else
+              {
+                <tr>
+                  <td colspan="5" class="text-center py-5">
+                    <div class="mb-3">
+                      <i class="mdi mdi-tag-off-outline text-muted" style="font-size: 48px;"></i>
+                    </div>
+                    <h6 class="text-muted">برچسبی یافت نشد</h6>
+                    @if (!string.IsNullOrEmpty(Context.Request.Query["searchQuery"]))
+                    {
+                      <p class="text-muted small mb-3">نتیجه‌ای برای جستجوی "@Context.Request.Query["searchQuery"]" پیدا نشد</p>
+                      <a href="/TagManager" class="btn btn-sm btn-outline-primary">نمایش همه برچسب‌ها</a>
+                    }
+                    else
+                    {
+                      <button type="button" class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                        <i class="mdi mdi-plus me-1"></i>
+                        افزودن اولین برچسب
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- صفحه‌بندی -->
+        @if (Model.TotalPages > 1)
+        {
+          <nav class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center">
+              <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                <a class="page-link" href="?pageNumber=@(Model.PageNumber - 1)&take=@Model.PageSize&searchQuery=@Context.Request.Query["searchQuery"]">
+                  <i class="mdi mdi-chevron-right"></i>
+                </a>
+              </li>
+
+              @{
+                int startPage = Math.Max(1, Model.PageNumber - 2);
+                int endPage = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+
+                if (startPage > 1)
+                {
+                  <li class="page-item">
+                    <a class="page-link" href="?pageNumber=1&take=@Model.PageSize&searchQuery=@Context.Request.Query["searchQuery"]">1</a>
+                  </li>
+                  if (startPage > 2)
+                  {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  }
+                }
+
+                for (int i = startPage; i <= endPage; i++)
+                {
+                  <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" href="?pageNumber=@i&take=@Model.PageSize&searchQuery=@Context.Request.Query["searchQuery"]">@i</a>
+                  </li>
+                }
+
+                if (endPage < Model.TotalPages)
+                {
+                  if (endPage < Model.TotalPages - 1)
+                  {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  }
+                  <li class="page-item">
+                    <a class="page-link" href="?pageNumber=@Model.TotalPages&take=@Model.PageSize&searchQuery=@Context.Request.Query["searchQuery"]">@Model.TotalPages</a>
+                  </li>
+                }
+              }
+
+              <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                <a class="page-link" href="?pageNumber=@(Model.PageNumber + 1)&take=@Model.PageSize&searchQuery=@Context.Request.Query["searchQuery"]">
+                  <i class="mdi mdi-chevron-left"></i>
+                </a>
+              </li>
+            </ul>
+            <div class="text-center text-muted small mt-2">
+              صفحه @Model.PageNumber از @Model.TotalPages
+            </div>
+          </nav>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Modal افزودن -->
+<div class="modal fade" id="addTagModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="mdi mdi-tag-plus me-2"></i>
+          افزودن برچسب جدید
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">نام برچسب <span class="text-danger">*</span></label>
+          <input type="text" id="tagName" class="form-control" placeholder="مثال: تکنولوژی" />
+          <div class="form-text">نام برچسب باید منحصر به فرد باشد</div>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="tagIsActive" checked />
+          <label class="form-check-label" for="tagIsActive">فعال</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">انصراف</button>
+        <button type="button" class="btn btn-primary" id="btnAddTag">
+          <i class="mdi mdi-check me-1"></i>
+          افزودن
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ویرایش -->
+<div class="modal fade" id="editTagModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="mdi mdi-pencil me-2"></i>
+          ویرایش برچسب
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editTagId" />
+        <div class="mb-3">
+          <label class="form-label">نام برچسب <span class="text-danger">*</span></label>
+          <input type="text" id="editTagName" class="form-control" />
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="editTagIsActive" />
+          <label class="form-check-label" for="editTagIsActive">فعال</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">انصراف</button>
+        <button type="button" class="btn btn-warning" id="btnUpdateTag">
+          <i class="mdi mdi-content-save me-1"></i>
+          ذخیره
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section AdditionalScript {
+  <script>
+    $(document).ready(function() {
+      // Tooltip
+      $('[data-bs-toggle="tooltip"]').tooltip();
+
+      // افزودن
+      $('#btnAddTag').off('click').on('click', function() {
+        const btn = $(this);
+        const name = $('#tagName').val().trim();
+        const isActive = $('#tagIsActive').is(':checked');
+        debugger
+        if (!name) {
+          toastr.error('نام برچسب الزامی است');
+          $('#tagName').focus();
+          return;
+        }
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>در حال افزودن...');
+
+        $.ajax({
+          url: 'TagManager/Create',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ name, isActive }),
+          success: function() {
+            $('#addTagModal').modal('hide');
+            toastr.success('برچسب با موفقیت اضافه شد');
+            setTimeout(() => location.reload(), 800);
+          },
+          error: function(xhr) {
+            btn.prop('disabled', false).html('<i class="mdi mdi-check me-1"></i>افزودن');
+            toastr.error(xhr.responseJSON?.message || 'خطا در افزودن برچسب');
+          }
+        });
+      });
+
+      $('#btnUpdateTag').off('click').on('click', function() {
+        const btn = $(this);
+        const id = $('#editTagId').val();
+        const name = $('#editTagName').val().trim();
+        const isActive = $('#editTagIsActive').is(':checked');
+
+        if (!name) {
+          toastr.error('نام برچسب الزامی است');
+          $('#editTagName').focus();
+          return;
+        }
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>در حال ذخیره...');
+
+        $.ajax({
+          url: `TagManager/Update/${id}`,
+          type: 'PUT',
+          contentType: 'application/json',
+          data: JSON.stringify({ id, name, isActive }),
+          success: function() {
+            $('#editTagModal').modal('hide');
+            toastr.success('برچسب با موفقیت ویرایش شد');
+            setTimeout(() => location.reload(), 800);
+          },
+          error: function(xhr) {
+            btn.prop('disabled', false).html('<i class="mdi mdi-content-save me-1"></i>ذخیره');
+            toastr.error(xhr.responseJSON?.message || 'خطا در ویرایش برچسب');
+          }
+        });
+      });
+
+      $('#addTagModal').on('hidden.bs.modal', function() {
+        $('#tagName').val('');
+        $('#tagIsActive').prop('checked', true);
+        $('#btnAddTag').prop('disabled', false).html('<i class="mdi mdi-check me-1"></i>افزودن');
+      });
+    });
+
+    function editTag(id, name, isActive) {
+      $('#editTagId').val(id);
+      $('#editTagName').val(name);
+      $('#editTagIsActive').prop('checked', isActive);
+      $('#editTagModal').modal('show');
+    }
+
+    function deleteTag(id, name) {
+      Swal.fire({
+        title: 'حذف برچسب',
+        html: `آیا از حذف برچسب <strong>"${name}"</strong> مطمئن هستید؟`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="mdi mdi-delete me-1"></i>بله، حذف شود',
+        cancelButtonText: 'انصراف',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+          return $.ajax({
+            url: 'TagManager/Delete/' + id,
+            type: 'DELETE'
+          });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      }).then((result) => {
+        if (result.isConfirmed) {
+          toastr.success('برچسب با موفقیت حذف شد');
+          setTimeout(() => location.reload(), 800);
+        }
+      }).catch((error) => {
+        Swal.fire('خطا', error.responseJSON?.message || 'خطا در حذف برچسب', 'error');
+      });
+    }
+  </script>
+}

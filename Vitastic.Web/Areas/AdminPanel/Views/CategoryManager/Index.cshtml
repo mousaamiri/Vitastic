@@ -1,0 +1,397 @@
+@model List<Vitastic.Web.Models.DTOs.Category.CategoryDetailDto>
+@{
+  ViewBag.AllCategories = Model;
+}
+
+@section AdditionalStyle
+{
+  <link href="~/shared/panel/vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="~/shared/panel/vendor/chartist/css/chartist.min.css">
+  <link href="~/shared/panel/vendor/nestable2/css/jquery.nestable.min.css" rel="stylesheet">
+  <link class="main-css" href="~/shared/panel/css/style.css" rel="stylesheet">
+  <style>
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @@keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+}
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <div class="row">
+      <div class="col-xl-4">
+        <div class="filter cm-content-box box-primary">
+          <div class="content-title SlideToolHeader">
+            <div class="cpa">افزودن دسته بندی جدید</div>
+            <div class="tools">
+              <a href="javascript:void(0);" class="expand handle"><i class="fal fa-angle-down"></i></a>
+            </div>
+          </div>
+          <div class="cm-content-body form excerpt">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-12 mb-3">
+                  <label for="categoryName">نام دسته بندی</label>
+                  <input type="text" class="form-control solid" id="categoryName" />
+                </div>
+                <div class="col-12 mb-3">
+                  <label for="categorySlug">نامک دسته بندی</label>
+                  <input type="text" class="form-control solid" id="categorySlug" />
+                </div>
+                <div class="col-12 mb-3">
+                  <label for="parentCategory">دسته مادر</label>
+                  <select class="form-control default-select wide" id="parentCategory">
+                    <option value="@Guid.Empty">انتخاب منو</option>
+                    @await Html.PartialAsync("_CategorySelectOptions", Model)
+                  </select>
+                </div>
+                <div class="col-12 mb-3">
+                  <label for="categoryDesc">توضیحات دسته بندی</label>
+                  <textarea class="form-control solid" id="categoryDesc"></textarea>
+                </div>
+                <div class="col-12 mb-3">
+                  <button type="button" class="btn btn-primary" id="btnAddCategory">افزودن دسته بندی</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-8">
+        <div class="filter cm-content-box box-primary">
+          <div class="content-title d-sm-flex d-block flex-wrap">
+            <div class="cpa d-flex align-items-center flex-wrap">
+              <span class="pe-3 pb-sm-0 pb-3">مدیریت دسته بندی ها</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm ms-sm-auto mb-2 mb-sm-0" id="btnSaveChanges">
+              ثبت تغییرات
+            </button>
+          </div>
+          <div class="cm-content-body form excerpt rounded-0">
+            <div class="card-body">
+              <h6 class="mb-1">ساختار دسته بندی ها</h6>
+              <div class="col-xl-12">
+                <div class="dd" id="nestable">
+                  <ol class="dd-list" id="categoryList">
+                    @foreach (var category in Model.Where(c => c.ParentCategoryId == null))
+                    {
+                      @await Html.PartialAsync("_CategoryItem", category)
+                    }
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="filter cm-content-box box-primary style-1 mb-0 border-0">
+            <div class="content-title">
+              <div class="cpa"></div>
+              <button type="button" class="btn btn-primary btn-sm" id="btnSaveChangesBottom">ثبت تغییرات</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@section AdditionalScript
+{
+  <script src="~/shared/panel/vendor/nestable2/js/jquery.nestable.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      console.log('=== Page loaded ===');
+
+      @if (TempData["SuccessMessage"] != null)
+        {
+          <text>toastr.success('@TempData["SuccessMessage"]'); </text>
+      }
+        @if (TempData["ErrorMessage"] != null)
+        {
+          <text>toastr.error('@TempData["ErrorMessage"]'); </text>
+      }
+
+        let hasChanges = false;
+
+      function showLoading() {
+        $('#loadingOverlay').css('display', 'flex');
+      }
+
+      function hideLoading() {
+        $('#loadingOverlay').hide();
+      }
+
+      function updateSaveButton() {
+        const isDisabled = !hasChanges;
+        $('#btnSaveChanges, #btnSaveChangesBottom').prop('disabled', isDisabled);
+      }
+
+      updateSaveButton();
+
+      // تاخیر برای اطمینان از لود کامل DOM و کتابخانه‌ها
+      setTimeout(function() {
+        console.log('Starting initialization...');
+
+        // پاک کردن کامل Nestable قبلی
+        const $nestable = $('#nestable');
+
+        if ($nestable.data('nestable')) {
+          console.log('Found existing Nestable, destroying...');
+          try {
+            $nestable.nestable('destroy');
+          } catch (e) {
+            console.warn('Destroy failed:', e);
+          }
+        }
+
+        // پاک کردن تمام event handler های قدیمی
+        $nestable.off();
+
+        // Initialize Nestable با تاخیر کوچک
+        setTimeout(function() {
+          console.log('Initializing Nestable NOW...');
+
+          var nestableElement = $nestable.nestable({
+            maxDepth: 5,
+            threshold: 30,
+            sensitivity: 10,
+            handleClass: 'dd-handle'
+          });
+
+          console.log('Nestable initialized. Testing drag capability...');
+          console.log('Nestable data:', nestableElement.data('nestable'));
+          console.log('Has dd-handle elements:', $('.dd-handle').length);
+
+          // Event listener برای Nestable
+          nestableElement.on('change', function() {
+            console.log('=== Nestable CHANGED ===');
+            hasChanges = true;
+            updateSaveButton();
+          });
+
+          // Initialize selectpicker
+          console.log('Initializing selectpicker...');
+          $('.default-select').selectpicker();
+
+          $('.category-parent-select').each(function() {
+            const $item = $(this).closest('.dd-item');
+            const originalParent = $item.data('original-parent');
+            if (originalParent) {
+              $(this).val(originalParent);
+            }
+            $(this).selectpicker('refresh');
+          });
+
+          console.log('=== Initialization COMPLETE ===');
+        }, 100);
+
+      }, 200);
+
+      // Event listeners
+      $(document).off('input', '.category-name-input, .category-slug-input, .category-desc-input')
+        .on('input', '.category-name-input, .category-slug-input, .category-desc-input', function() {
+          hasChanges = true;
+          updateSaveButton();
+
+          if ($(this).hasClass('category-name-input')) {
+            const newName = $(this).val();
+            $(this).closest('.dd-item').find('.category-title').first().text(newName);
+          }
+        });
+
+      $(document).off('change', '.category-parent-select')
+        .on('change', '.category-parent-select', function() {
+          hasChanges = true;
+          updateSaveButton();
+        });
+
+      $(document).off('click', '.btn-cancel-changes')
+        .on('click', '.btn-cancel-changes', function() {
+          const $item = $(this).closest('.dd-item');
+          const originalName = $item.data('original-name');
+          const originalSlug = $item.data('original-slug');
+          const originalParent = $item.data('original-parent');
+          const originalDesc = $item.data('original-desc');
+
+          $item.find('.category-name-input').val(originalName);
+          $item.find('.category-slug-input').val(originalSlug);
+          $item.find('.category-parent-select').val(originalParent || '').selectpicker('refresh');
+          $item.find('.category-desc-input').val(originalDesc);
+          $item.find('.category-title').first().text(originalName);
+
+          toastr.info('تغییرات لغو شد');
+        });
+
+      $(document).off('click', '.btn-delete-category')
+        .on('click', '.btn-delete-category', function() {
+          const categoryId = $(this).data('category-id');
+          const $item = $(this).closest('.dd-item');
+          const categoryName = $item.find('.category-title').first().text();
+
+          if (!confirm(`آیا از حذف "${categoryName}" اطمینان دارید?`)) return;
+
+          showLoading();
+          $.ajax({
+            url: `CategoryManager/${categoryId}`,
+            type: 'DELETE',
+            success: function() {
+              hideLoading();
+              toastr.success('حذف شد');
+              setTimeout(function() {
+                location.reload();
+              }, 500);
+            },
+            error: function(xhr) {
+              hideLoading();
+              console.error('Delete error:', xhr);
+              toastr.error('خطا در حذف');
+            }
+          });
+        });
+
+      $('#btnAddCategory').off('click').on('click', function() {
+        const name = $('#categoryName').val().trim();
+        const slug = $('#categorySlug').val().trim();
+        const parentCategoryId = $('#parentCategory').val();
+        const description = $('#categoryDesc').val().trim();
+
+        if (!name) {
+          toastr.error('نام الزامی است');
+          return;
+        }
+
+        showLoading();
+        $.ajax({
+          url: 'CategoryManager/Insert',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            name: name,
+            slug: slug,
+            parentCategoryId: parentCategoryId === '@Guid.Empty' ? null : parentCategoryId,
+            description: description
+          }),
+          success: function(response) {
+            hideLoading();
+            // Clear form
+            $('#categoryName').val('');
+            $('#categorySlug').val('');
+            $('#parentCategory').val('@Guid.Empty').selectpicker('refresh');
+            $('#categoryDesc').val('');
+
+            toastr.success('دسته بندی با موفقیت اضافه شد');
+
+            setTimeout(function() {
+              location.reload();
+            }, 500);
+          },
+          error: function(xhr) {
+            hideLoading();
+
+            let errorMessage = 'خطا در افزودن دسته بندی';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              errorMessage = xhr.responseJSON.message;
+            } else if (xhr.responseText) {
+              errorMessage = xhr.responseText;
+            }
+
+            toastr.error(errorMessage);
+          }
+        });
+      });
+
+      $('#btnSaveChanges, #btnSaveChangesBottom').off('click').on('click', function() {
+        if (!hasChanges) {
+          toastr.info('تغییری برای ذخیره وجود ندارد');
+          return;
+        }
+
+        const updates = [];
+        let displayOrderCounter = 1;
+
+        function processItem($item, parentId = null) {
+          const itemId = $item.data('id');
+          const name = $item.find('.category-name-input').first().val()?.trim() || '';
+          const slug = $item.find('.category-slug-input').first().val()?.trim() || '';
+          const description = $item.find('.category-desc-input').first().val()?.trim() || '';
+          const isRootLevel = $item.parent().attr('id') === 'categoryList';
+
+          updates.push({
+            id: itemId,
+            name: name,
+            slug: slug,
+            description: description,
+            parentCategoryId: isRootLevel ? null : parentId,
+            displayOrder: displayOrderCounter
+          });
+
+          displayOrderCounter++;
+
+          const $childrenList = $item.children('ol.dd-list');
+          if ($childrenList.length > 0) {
+            $childrenList.children('li.dd-item').each(function() {
+              processItem($(this), itemId);
+            });
+          }
+        }
+
+        $('#categoryList > .dd-item').each(function() {
+          processItem($(this), null);
+        });
+
+        if (updates.length === 0) {
+          toastr.info('تغییری برای ذخیره وجود ندارد');
+          return;
+        }
+
+        showLoading();
+        $.ajax({
+          url: 'CategoryManager/update-range',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(updates),
+          success: function(response) {
+            hideLoading();
+            hasChanges = false;
+            toastr.success('تغییرات ذخیره شد');
+            setTimeout(function() {
+              location.reload();
+            }, 1000);
+          },
+          error: function(xhr) {
+            hideLoading();
+            console.error('Update error:', xhr);
+            toastr.error('خطا در ذخیره تغییرات');
+          }
+        });
+      });
+    });
+
+
+  </script>
+}
+

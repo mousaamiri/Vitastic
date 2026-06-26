@@ -1,0 +1,243 @@
+@using Vitastic.Web.Helper
+@model Vitastic.Web.Models.Courses.ShopViewModel
+@{
+    var selectedCategories = Context.Request.Query["categories"]
+        .ToString()
+        .Split(',', StringSplitOptions.RemoveEmptyEntries);
+    var selectedLevels = Context.Request.Query["levels"]
+    .ToString()
+    .Split(',', StringSplitOptions.RemoveEmptyEntries);
+}
+
+<main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title light-background">
+        <div class="container d-lg-flex justify-content-between align-items-center">
+            <h1 class="mb-2 mb-lg-0">Courses</h1>
+            <nav class="breadcrumbs">
+                <ol>
+                    <li><a href="/">خانه</a></li>
+                    <li class="current">دوره ها</li>
+                </ol>
+            </nav>
+        </div>
+    </div><!-- End Page Title -->
+    <!-- Courses 2 Section -->
+    <section id="courses-2" class="courses-2 section">
+
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="course-filters mt-3" data-aos="fade-right" data-aos-delay="100">
+                        <h4 class="filter-title">فیلتر کردن دوره‌ها</h4>
+                        @if (Model.Filters is not null)
+                        {
+                            @if (Model.Filters.Categories.Count() != 0)
+                            {
+                                <div class="filter-group">
+                                    <h5>دسته‌بندی</h5>
+                                    <div class="filter-options">
+                                        <label class="filter-checkbox">
+                                            <input type="checkbox" onchange="updateQuery({ categories: '' })"
+                                                   @((selectedCategories == null || selectedCategories.Length == 0) ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                            همه دسته‌ها
+                                        </label>
+                                        @foreach (var category in Model.Filters.Categories.ToList())
+                                        {
+                                            <label class="filter-checkbox">
+                                                <input type="checkbox" onchange="updateQuery({ categories: '@category' })"
+                                                       @(selectedCategories.Contains(category) ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                                @category
+                                            </label>
+                                        }
+
+
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.Filters.Levels.Count() != 0)
+                            {
+                                <div class="filter-group">
+                                    <h5>سطح</h5>
+                                    <div class="filter-options">
+                                        <label class="filter-checkbox">
+                                            <input type="checkbox" onchange="updateQuery({ levels: '' })"
+                                                   @(selectedLevels.Length == 0 ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                            تمام سطوح
+                                        </label>
+                                        @foreach (var level in Model.Filters.Levels)
+                                        {
+                                            <label class="filter-checkbox">
+                                                <input type="checkbox" onchange="updateQuery({ levels: '@level' })"
+                                                       @(selectedLevels.Contains(level.ToString()) ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                                @level.LevelTranslator()
+                                            </label>
+                                        }
+
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.Filters.Instructors.Count() != 0)
+                            {
+                                <div class="filter-group">
+                                    <h5>مدرس</h5>
+                                    <div class="filter-options">
+                                        <label class="filter-checkbox">
+                                            <input type="checkbox" onchange="updateQuery({ instructor: '' })"
+                                                   @(Context.Request.Query["instructor"] == "" ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                            همه مدرسان
+                                        </label>
+                                        @foreach (var instructor in Model.Filters.Instructors)
+                                        {
+                                            <label class="filter-checkbox">
+                                                <input type="checkbox" onchange="updateQuery({ instructor: '@instructor' })"
+                                                       @(Context.Request.Query["instructor"] == instructor ? "checked" : "")>
+                                                <span class="checkmark"></span>
+                                                @instructor
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.Filters.MaxDuration > TimeSpan.Zero)
+                            {
+                            }
+
+                            @if (Model.Filters.MaxPrice > 0)
+                            {
+                                <div class="filter-group">
+                                    <h5>قیمت</h5>
+                                    <div class="filter-options">
+                                        <label class="filter-checkbox">
+                                            <input type="checkbox"
+                                                   onchange="updateQuery({ freeOnly: this.checked })"
+                                                   @(Context.Request.Query["freeOnly"] == "true" ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                            رایگان
+                                        </label>
+                                        <label class="filter-checkbox">
+                                            <input type="checkbox"
+                                                   onchange="updateQuery({ duration: 'short' })"
+                                                   @(Context.Request.Query["duration"] == "short" ? "checked" : "")>
+                                            <span class="checkmark"></span>
+                                            پولی
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>            <!--End course filter -->
+
+                <div class="col-lg-9">
+                    <div class="courses-header mt-3" data - aos="fade-left" data - aos - delay="100">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text"
+                                   placeholder="جستجوی دوره‌ها..."
+                                   value="@Context.Request.Query["search"]"
+                                   onkeydown="if(event.key==='Enter') updateQuery({ search: this.value })">
+                        </div>
+                        <div class="sort-dropdown">
+                            <select onchange="updateQuery({ orderBy: this.value })">
+                                <option value="0" selected="@(Context.Request.Query["orderBy"] == "0")">
+                                    مرتب‌سازی بر اساس:
+                                    محبوب‌ترین‌ها
+                                </option>
+                                <option value="1" selected="@(Context.Request.Query["orderBy"] == "1")"> جدیدترین‌ها در ابتدا</option>
+                                <option value="2" selected="@(Context.Request.Query["orderBy"] == "2")"> قیمت: از کم به زیاد</option>
+                                <option value="3" selected="@(Context.Request.Query["orderBy"] == "3")"> قیمت: از زیاد به کم</option>
+                                <option value="4" selected="@(Context.Request.Query["orderBy"] == "4")">
+                                    مدت زمان:
+                                    از کوتاه به بلند
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="courses-grid" data - aos="fade-up" data - aos - delay="200">
+                        <div class="row">
+                            @foreach (var course in Model.Courses!.Items)
+                            {
+                                <partial name="Partials/_CourseBox" model="course"></partial>
+                                <div class="pagination-wrapper" data-aos="fade-up" data-aos-delay="300">
+                                    <nav aria-label="صفحه‌بندی دوره‌ها">
+                                        <ul class="pagination justify-content-center">
+
+                                            <!-- Previous -->
+                                            <li class="page-item @(Model.Courses.HasPreviousPage ? "" : "disabled")">
+                                                <a class="page-link"
+                                                   href="@Url.Action("Index", new { pageIndex = Model.Courses.PageNumber - 1 })"
+                                                   tabindex="-1"
+                                                   aria-disabled="@(!Model.Courses.HasPreviousPage)">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </a>
+                                            </li>
+
+                                            @{
+                                                var start = Math.Max(1, Model.Courses.PageNumber - 2);
+                                                var end = Math.Min(Model.Courses.TotalPages, Model.Courses.PageNumber + 2);
+                                            }
+
+                                            @for (int i = start; i <= end; i++)
+                                            {
+                                                <li class="page-item @(i == Model.Courses.PageNumber ? "active" : "")">
+                                                    <a class="page-link"
+                                                       href="@Url.Action("Index", new { pageIndex = i })">
+                                                        @i
+                                                    </a>
+                                                </li>
+                                            }
+
+                                            <!-- Next -->
+                                            <li class="page-item @(Model.Courses.HasNextPage ? "" : "disabled")">
+                                                <a class="page-link"
+                                                   href="@Url.Action("Index", new { pageIndex = Model.Courses.PageNumber + 1 })"
+                                                   aria-disabled="@(!Model.Courses.HasNextPage)">
+                                                    <i class="bi bi-chevron-left"></i>
+                                                </a>
+                                            </li>
+
+                                        </ul>
+                                    </nav>
+                                </div>
+                            }
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</main>
+<!--Courses 2 Section-->
+
+<script>
+      function updateQuery(params) {
+      const url = new URL(window.location.href);
+      debugger;
+      Object.keys(params).forEach(key => {
+
+          const value = params[key];
+          debugger;
+          if (value == null || value === "" || value === false) {
+            url.searchParams.delete(key);
+          } else {
+            url.searchParams.set(key, value);
+          }
+        });
+      url.searchParams.set("pageIndex", 1);
+      window.location.href = url.toString();
+    }
+</script>

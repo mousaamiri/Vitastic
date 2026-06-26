@@ -1,0 +1,116 @@
+@* Result.cshtml — Shared payment result page *@
+@{
+  var isSuccess = (bool)(ViewBag.IsSuccess ?? false);
+  ViewBag.Title = isSuccess ? "پرداخت موفق" : "پرداخت ناموفق";
+  Layout = "_Layout";
+
+  // Read dynamic button config from TempData
+  var primaryText = TempData["PrimaryButtonText"] as string;
+  var primaryUrl = TempData["PrimaryButtonUrl"] as string;
+  var retryText = TempData["RetryButtonText"] as string;
+  var retryUrl = TempData["RetryButtonUrl"] as string;
+  var secondaryText = TempData["SecondaryButtonText"] as string;
+  var secondaryUrl = TempData["SecondaryButtonUrl"] as string;
+}
+
+@* ============================== Hero Section ============================== *@
+<section class="d-flex justify-content-center align-items-center" style="min-height: 65vh;">
+  <div class="text-center px-3" style="max-width: 540px;">
+
+    @* ============ Icon ============ *@
+    @if (isSuccess)
+    {
+      <div class="mb-4">
+        <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center"
+             style="width: 100px; height: 100px;">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        </div>
+      </div>
+    }
+    else
+    {
+      <div class="mb-4">
+        <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center"
+             style="width: 100px; height: 100px;">
+          <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
+        </div>
+      </div>
+    }
+
+    @* ============ Title & Message ============ *@
+    @if (isSuccess)
+    {
+      <h2 class="fw-bold text-success mb-3">پرداخت با موفقیت انجام شد</h2>
+
+      @if (TempData["Success"] is string successMsg)
+      {
+        <div class="alert alert-success mt-3">
+          <i class="bi bi-info-circle me-1"></i>
+          @successMsg
+        </div>
+      }
+    }
+    else
+    {
+      <h2 class="fw-bold text-danger mb-3">پرداخت ناموفق</h2>
+
+      @if (TempData["Error"] is string errorMsg)
+      {
+        <div class="alert alert-danger mt-3">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          @errorMsg
+        </div>
+      }
+      else
+      {
+        <div class="alert alert-warning mt-3">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          در صورت کسر مبلغ از حساب شما، ظرف ۷۲ ساعت آینده مبلغ بازگردانده خواهد شد.
+        </div>
+      }
+    }
+
+    @* ============ Action Buttons (Dynamic) ============ *@
+    <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
+
+      @* Primary button — shown on success *@
+      @if (!string.IsNullOrEmpty(primaryText) && !string.IsNullOrEmpty(primaryUrl))
+      {
+        <a href="@primaryUrl" class="btn btn-success px-4 py-2">
+          <i class="bi bi-check-lg me-1"></i>
+          @primaryText
+        </a>
+      }
+
+      @* Retry button — shown on failure *@
+      @if (!string.IsNullOrEmpty(retryText) && !string.IsNullOrEmpty(retryUrl))
+      {
+        <a href="@retryUrl" class="btn btn-danger px-4 py-2">
+          <i class="bi bi-arrow-repeat me-1"></i>
+          @retryText
+        </a>
+      }
+
+      @* Secondary button — shown in both cases *@
+      @if (!string.IsNullOrEmpty(secondaryText) && !string.IsNullOrEmpty(secondaryUrl))
+      {
+        <a href="@secondaryUrl" class="btn btn-outline-secondary px-4 py-2">
+          @secondaryText
+        </a>
+      }
+
+    </div>
+
+    @* ============ Support Info ============ *@
+    <div class="mt-5 pt-3 border-top">
+      <p class="text-muted small mb-0">
+        <i class="bi bi-headset me-1"></i>
+        در صورت بروز مشکل با پشتیبانی تماس بگیرید:
+        <a href="tel:02191001234" class="text-decoration-none fw-semibold" dir="ltr">
+          ۰۲۱-۹۱۰۰۱۲۳۴
+        </a>
+      </p>
+    </div>
+
+  </div>
+</section>

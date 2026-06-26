@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+  <title>ویتاستیک | @ViewData["CourseTitle"]</title>
+  <partial name="_MetaTags"/>
+
+  <partial name="_Styles"/>
+  @await RenderSectionAsync("AdditionalStyle", false)
+
+</head>
+
+<body class="index-page" dir="rtl">
+<!--Header-->
+<partial name="_Header"/>
+
+<!--Body-->
+<main class="main" id="main">
+  @RenderBody()
+</main>
+
+<!--Footer-->
+<partial name="_Footer"/>
+
+<!-- Scroll Top -->
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+                                                                                                  class="bi bi-arrow-up-short"></i></a>
+
+<!-- Pre loader -->
+<div id="preloader"></div>
+
+<!-- Vendor JS Files -->
+<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/lib/php-email-form/validate.js" asp-append-version="true"></script>
+<script src="~/lib/aos/aos.js" asp-append-version="true"></script>
+<script src="~/lib/purecounter/purecounter_vanilla.js" asp-append-version="true"></script>
+<script src="~/lib/swiper/swiper-bundle.min.js" asp-append-version="true"></script>
+
+<!-- Main JS File -->
+<script src="~/public/js/main.js" asp-append-version="true"></script>
+<!-- Sweet alert  -->
+<script src="~/lib/toastr/toastr.js" asp-append-version="true"></script>
+<script>
+toastr.options = {
+    closeButton: true,
+    progressBar: true,
+    positionClass: "toast-top-center",
+    timeOut: 5000,
+    rtl: true
+};
+</script>
+
+@await RenderSectionAsync("AdditionalScript", false)
+</body>
+
+</html>

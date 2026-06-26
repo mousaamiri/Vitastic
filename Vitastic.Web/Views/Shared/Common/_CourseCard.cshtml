@@ -1,0 +1,99 @@
+@model Vitastic.Web.Models.ViewModels.CourseCardViewModel
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- COURSE CARD -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="col-lg-4 col-md-6 aos-init aos-animate" data-aos="fade-up" data-aos-delay="200">
+  <div class="course-card">
+
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- COURSE IMAGE -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <div class="course-image">
+      <img src="@Model.Course.ImageName" alt="دوره" class="img-fluid">
+      @if (Model.Course.HasCertificate)
+      {
+        <div class="badge featured">مجوز دارد</div>
+      }
+      <div class="price-badge">
+        @(Model.IsFree ? "رایگان" : Model.Course.Price.ToString("##,### ") + " تومان  ")
+      </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════ -->
+    <!-- COURSE CONTENT -->
+    <!-- ═════════════════════════════════════════════════ -->
+    <div class="course-content">
+
+      <!-- Course Meta Info -->
+      <div class="course-meta">
+        <span class="level">@Model.Course.Level</span>
+        <span class="duration">مدت زمان : @Model.Course.TotalDuration </span>
+      </div>
+
+      <!-- Course CourseTitle & Description -->
+      <h3><a href="#">@Model.Course.Title</a></h3>
+      <p>@Model.Course.ShortDescription</p>
+
+      <!-- InstructorFullNameFullName Info -->
+      <div class="instructor instructor-info">
+        <img src="@Model.Course.Instructor.Avatar" alt="مربی" class="instructor-img instructor-avatar">
+        <div class="instructor-info d-block">
+          <span class="fs-6 instructor-name d-block">@Model.Course.Instructor.Name</span>
+          <span class="fs-12 d-block">@Model.Course.Instructor.Experties</span>
+        </div>
+      </div>
+
+      <!-- Course Stats -->
+      <div class="course-stats">
+        <div class="rating">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-half"></i>
+          <span>(4.5)</span>
+        </div>
+        <div class="students">
+          <i class="bi bi-people-fill"></i>
+          <span>342 دانشجو</span>
+        </div>
+      </div>
+
+      <!-- ═════════════════════════════════════════════ -->
+      <!-- ACTION BUTTONS -->
+      <!-- ═════════════════════════════════════════════ -->
+      @if (Model.Course.IsPurchased)
+      {
+        <!-- Already Purchased - Watch Course -->
+        <a href="/Course/@Model.Course.Id/Watch"
+           class="btn-course btn btn-success w-100 mt-2">
+          <i class="fas fa-play-circle me-1"></i>
+          مشاهده دوره
+        </a>
+      }
+      else if (Model.Course.IsInCart)
+      {
+        <!-- Already in Cart -->
+        <button type="button"
+                class="btn-course btn btn-secondary w-100 mt-2"
+                disabled>
+          <i class="fas fa-check-circle me-1"></i>
+          در سبد خرید شما
+        </button>
+      }
+      else
+      {
+        <!-- Add to Cart -->
+        <button type="button"
+                class="btn-course add-to-cart-btn"
+                data-course-id="@Model.Course.Id">
+          <i class="fas fa-shopping-cart me-1"></i>
+          اکنون ثبت نام کنید
+        </button>
+      }
+
+    </div>
+  </div>
+</div>
+<!-- End Course Item -->

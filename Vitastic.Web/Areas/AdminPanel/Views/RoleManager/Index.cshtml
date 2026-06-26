@@ -1,0 +1,292 @@
+@model PaginatedData<Vitastic.Web.Models.DTOs.Role.RoleDto>
+
+@{
+  ViewBag.Title = "لیست نقش ها | ویتاستیک";
+}
+
+<style>
+  table.dataTable > thead > tr > th {
+    text-align: right !important;
+  }
+
+  #permissionsContainer {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 5px;
+  }
+</style>
+
+@if (TempData["ErrorMessage"] != null)
+{
+  <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<button type="button" class="btn btn-primary btn-sm ms-2" id="addRoleBtn">
+  + افزودن نقش
+</button>
+
+<div class="table-responsive">
+  <table id="example3" class="display table" style="min-width: 845px">
+    <thead>
+      <tr>
+        <th>نام نقش</th>
+        <th>تعداد مجوزها</th>
+        <th>اکشن ها</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var role in Model.Items)
+      {
+        <tr>
+          <td>@role.Name</td>
+          <td>@role.PermissionCount</td>
+          <td>
+            <div class="d-flex">
+              <button type="button" class="btn btn-primary shadow btn-xs sharp me-1 edit-btn"
+                      data-id="@role.Id"
+                      data-name="@role.Name">
+                <i class="fas fa-pencil-alt"></i>
+              </button>
+              <a href="#" class="btn btn-danger shadow btn-xs sharp delete-btn" data-id="@role.Id">
+                <i class="fa fa-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editRoleModalLabel">ویرایش نقش</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editRoleForm">
+          <input type="hidden" id="roleId" name="roleId" />
+
+          <div class="mb-3">
+            <label class="form-label">نام نقش</label>
+            <input type="text" class="form-control" id="roleName" name="roleName" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">مجوزها</label>
+            <div id="permissionsContainer">
+              <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+        <button type="button" class="btn btn-primary" id="saveRoleBtn">ذخیره تغییرات</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section AdditionalScript {
+  <script>
+    $(document).ready(function() {
+
+      $('.btn-primary.btn-sm.ms-2').on('click', function(e) {
+        e.preventDefault();
+
+        $('#roleId').val('00000000-0000-0000-0000-000000000000');
+        $('#roleName').val('');
+        $('#editRoleModalLabel').text('افزودن نقش');
+
+        $('#permissionsContainer').html(`
+          <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+          </div>
+        `);
+
+        const modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+        modal.show();
+
+        loadPermissionsForRole('00000000-0000-0000-0000-000000000000');
+      });
+
+      $('#example3').on('click', '.edit-btn', function() {
+        const id = $(this).data('id');
+        const name = $(this).data('name');
+
+        $('#roleId').val(id);
+        $('#roleName').val(name);
+        $('#editRoleModalLabel').text('ویرایش نقش');
+
+        $('#permissionsContainer').html(`
+          <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">در حال بارگذاری...</span>
+            </div>
+          </div>
+        `);
+
+        const modal = new bootstrap.Modal(document.getElementById('editRoleModal'));
+        modal.show();
+
+        loadPermissionsForRole(id);
+      });
+
+      function loadPermissionsForRole(roleId) {
+        $.get('/admin/RoleManager/permissions')
+          .done(function(allPermissions) {
+            if (roleId === '00000000-0000-0000-0000-000000000000') {
+              renderPermissions(allPermissions, []);
+            } else {
+              $.get(`/admin/RoleManager/${roleId}/permissions`)
+                .done(function(rolePermissions) {
+                  renderPermissions(allPermissions, rolePermissions);
+                })
+                .fail(function() {
+                  $('#permissionsContainer').html('<p class="text-danger">خطا در بارگذاری مجوزهای نقش</p>');
+                });
+            }
+          })
+          .fail(function() {
+            $('#permissionsContainer').html('<p class="text-danger">خطا در بارگذاری لیست مجوزها</p>');
+          });
+      }
+
+      function renderPermissions(allPermissions, rolePermissions) {
+        const rolePermissionIds = rolePermissions.map(p => String(p.id));
+        let html = '';
+
+        allPermissions.forEach(p => {
+          const isChecked = rolePermissionIds.includes(String(p.id));
+          html += `
+            <div class="form-check mb-2">
+              <input class="form-check-input permission-checkbox"
+                     type="checkbox"
+                     value="${p.id}"
+                     id="perm_${p.id}"
+                     ${isChecked ? 'checked' : ''}>
+              <label class="form-check-label" for="perm_${p.id}">
+                <strong>${p.code}</strong>
+                ${p.description ? `<small class="text-muted ms-2">${p.description}</small>` : ''}
+              </label>
+            </div>
+          `;
+        });
+
+        $('#permissionsContainer').html(html);
+      }
+
+      $('#saveRoleBtn').on('click', function() {
+        const roleId = $('#roleId').val();
+        const name = $('#roleName').val();
+        const selectedPermissionIds = [];
+
+        $('.permission-checkbox:checked').each(function() {
+          selectedPermissionIds.push($(this).val());
+        });
+
+        const isCreate = roleId === '00000000-0000-0000-0000-000000000000';
+
+        if (isCreate) {
+          $.ajax({
+            url: `/admin/RoleManager/${roleId}/UpsertRole`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              roleName: name,
+              permissionIds: selectedPermissionIds
+            })
+          })
+            .done(function() {
+              alert('نقش با موفقیت ایجاد شد!');
+              bootstrap.Modal.getInstance(document.getElementById('editRoleModal')).hide();
+              location.reload();
+            })
+            .fail(function() {
+              alert('خطا در ایجاد نقش!');
+            });
+        } else {
+          $.ajax({
+            url: `/admin/RoleManager/${roleId}/UpsertRole`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              roleName: name,
+              permissionIds: selectedPermissionIds
+            })
+          })
+            .done(function() {
+              alert('تغییرات با موفقیت ذخیره شد!');
+              bootstrap.Modal.getInstance(document.getElementById('editRoleModal')).hide();
+              location.reload();
+            })
+            .fail(function() {
+              alert('خطا در ذخیره تغییرات!');
+            });
+        }
+      });
+
+      $('#example3').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+          "url": "/admin/RoleManager/Index",
+          "type": "POST",
+          "contentType": "application/json",
+          "data": function(d) {
+            return JSON.stringify(d);
+          }
+        },
+        "columns": [
+          { "data": "name" },
+          { "data": "permissionCount" },
+          {
+            "data": null,
+            "orderable": false,
+            "render": function(data, type, row) {
+              return `
+                <div class="d-flex">
+                  <button type="button" class="btn btn-primary shadow btn-xs sharp me-1 edit-btn"
+                          data-id="${row.id}"
+                          data-name="${row.name}">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <a href="#" class="btn btn-danger shadow btn-xs sharp delete-btn" data-id="${row.id}">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </div>
+              `;
+            }
+          }
+        ],
+        "language": {
+          "search": "جستجو:",
+          "lengthMenu": "نمایش _MENU_ ردیف در صفحه",
+          "zeroRecords": "موردی یافت نشد",
+          "info": "نمایش _PAGE_ از _PAGES_",
+          "infoEmpty": "داده‌ای وجود ندارد",
+          "infoFiltered": "(فیلتر شده از _MAX_ ردیف)",
+          "paginate": {
+            "first": "ابتدا",
+            "last": "انتها",
+            "next": "بعدی",
+            "previous": "قبلی"
+          },
+          "processing": "در حال پردازش..."
+        },
+        "order": [[0, "asc"]]
+      });
+    });
+
+  </script>
+}

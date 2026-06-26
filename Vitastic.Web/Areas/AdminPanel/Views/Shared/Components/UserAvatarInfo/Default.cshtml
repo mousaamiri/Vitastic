@@ -1,0 +1,11 @@
+@model Vitastic.Web.Models.DTOs.Auth.UserAvatarInfoDto
+
+<div class="card-header py-2">
+  <div class="products">
+    <img src="@Model.Avatar" class="avatar avatar-md" alt="آواتار کاربر">
+    <div>
+      <h6>@(string.IsNullOrEmpty(Model.FullName) ? Model.UserName : Model.FullName)</h6>
+      <span>@string.Join("، ", Model.RoleNames)</span>
+    </div>
+  </div>
+</div>

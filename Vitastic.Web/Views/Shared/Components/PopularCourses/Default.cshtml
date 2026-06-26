@@ -1,0 +1,18 @@
+
+@model PaginatedData<Vitastic.Web.Models.ViewModels.CourseCardViewModel>
+
+<div class="container aos-init aos-animate" data-aos="fade-up" data-aos-delay="100">
+
+		<div class="row gy-4">
+
+@foreach (var course in Model.Items)
+{
+  <partial name="Common/_CourseCard" model="course"/>
+}
+		</div>
+
+		<div class="more-courses text-center aos-init aos-animate" data-aos="fade-up" data-aos-delay="500">
+			<a href="courses.html" class="btn-more">مشاهده همه دوره‌ها</a>
+		</div>
+
+	</div>

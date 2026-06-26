@@ -1,0 +1,6 @@
+﻿@model dynamic
+
+<form method="get" action="@Url.Action("Search", "Courses")" class="search-box">
+  <input type="text" name="q" placeholder="@Model.Placeholder" required>
+  <button type="submit">🔍</button>
+</form>

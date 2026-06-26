@@ -1,0 +1,261 @@
+@model Vitastic.Web.Models.ViewModels.CourseListViewModel
+@{
+  ViewData["CourseTitle"] = "دوره‌های آموزشی من";
+}
+
+@* ============================================ *@
+@* SECTION: Page Header                         *@
+@* ============================================ *@
+<div class="bg-light py-4 mb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h1 class="h3 mb-2 mb-md-0">دوره‌های آموزشی من</h1>
+      </div>
+      <div class="col-md-6">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0 justify-content-md-end">
+            <li class="breadcrumb-item"><a href="index.html">خانه</a></li>
+            <li class="breadcrumb-item active" aria-current="page">دوره ها</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form id="filterForm" method="get"
+      action="@Url.Action("Index", "UserCourses", new {area = "UserPanel"})">
+
+  @* ============================================ *@
+  @* SECTION: Main Content                        *@
+  @* ============================================ *@
+  <section class="mb-5">
+    <div class="container">
+    <div class="row">
+
+      @* ================================ *@
+      @* SIDEBAR: Filters                 *@
+      @* ================================ *@
+      <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">فیلتر ها</h5>
+          </div>
+          <div class="card-body">
+
+            @* Result Count Alert *@
+            <div class="alert alert-info mb-3">
+              <i class="bi bi-info-circle me-2"></i>
+              @Model.Courses.TotalCount دوره یافت شد
+            </div>
+
+            @* Category Filter *@
+            <div class="mb-3">
+              <label for="CategoryIdInputFilter" class="form-label fw-bold">دسته‌بندی</label>
+              <select name="CategoryId"
+                      id="CategoryIdInputFilter"
+                      class="form-select">
+                <option value="">همه دسته‌بندی‌ها</option>
+                @foreach (var cat in Model.Categories)
+                {
+                  <option value="@cat.Id"
+                          selected="@(Model.Filter.CategoryId == cat.Id)">
+                    @cat.Name
+                  </option>
+                }
+              </select>
+            </div>
+
+            @* Level Filter *@
+            <div class="mb-3">
+              <label for="levelInputFilter" class="form-label fw-bold">سطح دوره</label>
+              <select name="Level"
+                      id="levelInputFilter"
+                      class="form-select">
+                <option value="">همه سطوح</option>
+                @foreach (var level in Model.Levels)
+                {
+                  <option value="@level.Value"
+                          selected="@Equals(Model.Filter.Level, level.Value)">
+                    @level.Text
+                  </option>
+                }
+              </select>
+            </div>
+
+            @* Price Range Filter *@
+            <div class="mb-3">
+              <label class="form-label fw-bold">محدوده قیمت</label>
+              <div class="row g-2">
+                <div class="col-12">
+                  <input type="number"
+                         name="MinUnitPrice"
+                         id="minPriceInputFilter"
+                         value="@Model.Filter.MinPrice"
+                         placeholder="از (تومان)"
+                         class="form-control" />
+                </div>
+                <div class="col-12 text-center">
+                  <small class="text-muted">تا</small>
+                </div>
+                <div class="col-12">
+                  <input type="number"
+                         id="maxPriceInputFilter"
+                         name="MaxUnitPrice"
+                         value="@Model.Filter.MaxPrice"
+                         placeholder="تا (تومان)"
+                         class="form-control" />
+                </div>
+              </div>
+            </div>
+          </div>
+          @* Checkboxes *@
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input"
+                     type="checkbox"
+                     name="IsFree"
+                     id="isFreeInputFilter"
+                     value="true"
+                     checked="@(Model.Filter.IsFree == true)">
+              <label class="form-check-label" for="isFreeInputFilter">
+                فقط دوره‌های رایگان
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     name="HasCertificate"
+                     id="hasCertificateInputFilter"
+                     value="true"
+                     checked="@(Model.Filter.HasCertificate == true)">
+              <label class="form-check-label" for="hasCertificateInputFilter">
+                دارای گواهینامه
+              </label>
+            </div>
+          </div>
+
+          <input type="hidden" id="pageNumberInputFilter" name="PageNumber" value="1" />
+          <input type="hidden" id="pageSizeInputFilter" name="PageSize" value="@Model.Filter.PageSize" />
+
+        </div>
+      </div>
+      
+
+      @* ================================ *@
+      @* MAIN: Course Grid                *@
+      @* ================================ *@
+      <div class="col-lg-9">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          @* Search *@
+          <div class="input-group w-50">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text"
+                   id="searchTermInputFilter"
+                   name="Search"
+                   value="@Model.Filter.SearchTerm"
+                   placeholder="نام دوره یا مدرس..."
+                   class="form-control">
+          </div>
+
+          @* Sorting *@
+          <div>
+            <select id="sortBySelectInputFilter"
+                    name="SortBy"
+                    class="form-select">
+              <option>مرتب سازی بر اساس : @Model.SortOptions.First().Text</option>
+              @foreach (var sort in Model.SortOptions)
+              {
+                <option value="@sort.Value"
+                        selected="@Equals(Model.Filter.SortBy, sort.Value)">
+                  @sort.Text
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @* Course Grid *@
+        <div id="courseGrid" class="row g-4">
+          @await Html.PartialAsync("Common/_CourseGrid", Model)
+        </div>
+
+      </div>
+    </div>
+    </div>
+  </section>
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const filterForm = document.getElementById("filterForm");
+    const courseGrid = document.getElementById("courseGrid");
+    const inputs = filterForm.querySelectorAll("input, select");
+
+    if (!filterForm || !courseGrid) return;
+
+    const searchInput = document.querySelector("input[name='Search']");
+
+    inputs.forEach(inp => inp.addEventListener("change", updateCourses));
+    searchInput.addEventListener("input", debounce(updateCourses, 400));
+
+    function updateCourses() {
+      const formData = new URLSearchParams(new FormData(filterForm));
+      showLoading();
+
+      fetch(`/UserCourses?${formData.toString()}`, {
+        method: "GET",
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(async (response) => {
+
+          const contentType = response.headers.get("content-type");
+
+          if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            hideLoading();
+            showNotification(data.message || "خطای ناشناخته", "error");
+            return;
+          }
+
+          const html = await response.text();
+          courseGrid.innerHTML = html;
+          hideLoading();
+        })
+        .catch(err => {
+          hideLoading();
+          showNotification("خطا در اتصال به سرور", "error");
+        });
+    }
+
+    function showLoading() {
+      courseGrid.innerHTML =
+        `<div class="text-center py-5">
+                  <div class="spinner-border text-primary"></div>
+                  <p class="mt-3">در حال بارگذاری...</p>
+               </div>`;
+    }
+
+    function hideLoading() { }
+
+    function showNotification(message, type = "error") {
+      if (typeof toastr !== "undefined") {
+        toastr[type](message);
+        return;
+      }
+      alert(message);
+    }
+
+    function debounce(fn, delay) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(this, args), delay);
+      }
+    }
+  });
+</script>
+
