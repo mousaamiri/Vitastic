@@ -3,6 +3,20 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+#################################
+.containers/
+.continue/
+.ruleset
+compose.yaml
+docker-compose.dcproj
+qodana.yaml
+structure.txt
+package-lock.json
+package.json
+launchSettings.json      
+Vitastic.Api/wwwroot/  
+#################################
+
 # User-specific files
 *.rsuser
 *.suo
@@ -379,4 +393,14 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
-FodyWeavers.xsd
+FodyWeavers.xsdVitastic.Api/wwwroot/storage/
+.containers/
+.continue/
+.ruleset
+compose.yaml
+docker-compose.dcproj
+qodana.yaml
+structure.txt
+package.json
+package-lock.json
+launchSettings.json
