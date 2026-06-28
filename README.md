@@ -74,7 +74,7 @@ Vitastic/
 ### اجرا با Docker
 
 ```bash
-git clone https://github.com/your-username/Vitastic.git
+git clone https://github.com/mousaamiri/Vitastic.git
 cd Vitastic
 docker-compose up --build
 ```
