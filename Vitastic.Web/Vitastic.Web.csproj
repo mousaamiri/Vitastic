@@ -1134,7 +1134,6 @@
     <ItemGroup>
       <Folder Include="Areas\UserPanel\Models\" />
       <Folder Include="Views\Shared\Components\" />
-      <Folder Include="wwwroot\admin\" />
       <Folder Include="wwwroot\public\" />
       <Folder Include="wwwroot\shared\panel\" />
       <Folder Include="wwwroot\user-panel\" />
