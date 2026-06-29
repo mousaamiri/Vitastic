@@ -61,6 +61,4 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
-Vitastic.Web/wwwroot/shared/panel/vendor/** linguist-vendored
-Vitastic.Web/wwwroot/lib/** linguist-vendored
-Vitastic.Web/wwwroot/shared/panel/icons/** linguist-vendored
+Vitastic.Web/wwwroot/** linguist-vendored
